@@ -3,6 +3,12 @@
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 
+// Next.js 15+ page props - params and searchParams are now Promises
+type PageProps = {
+  params: Promise<Record<string, never>>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
 // Animated gradient orb
 function GradientOrb({ className }: { className?: string }) {
   return (
@@ -118,10 +124,13 @@ function StatusModes() {
           <button
             key={mode.id}
             onClick={() => setActiveMode(mode.id)}
+            style={{
+              backgroundColor: activeMode === mode.id ? "#4a5d4a" : "transparent",
+            }}
             className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
               activeMode === mode.id
-                ? "bg-[#1a1915] text-[#faf9f7]"
-                : "bg-[#faf9f7] text-[#8a8780] hover:text-[#1a1915]"
+                ? "text-[#faf9f7]"
+                : "text-[#8a8780] hover:text-[#4a5d4a]"
             }`}
           >
             {mode.label}
@@ -435,7 +444,7 @@ function EmailSignup({ dark = false }: { dark?: boolean }) {
             type="submit"
             disabled={loading}
             className={`${
-              dark ? "bg-[#faf9f7] text-[#1a1915] hover:bg-[#e8e6e1]" : "bg-transparent text-[#8a8780] hover:text-[#1a1915] hover:bg-[#f5f4f0]/50 border border-[#e8e6e1]/50"
+              dark ? "bg-[#faf9f7] text-[#8a8780] hover:bg-[#e8e6e1] hover:text-[#1a1915]" : "bg-transparent text-[#8a8780] hover:text-[#1a1915] hover:bg-[#f5f4f0]/50 border border-[#e8e6e1]/50"
             } px-8 py-4 font-medium transition-colors sm:rounded-r-xl disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {loading ? (
@@ -506,7 +515,10 @@ function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string
   );
 }
 
-export default function Home() {
+export default function Home(_props: PageProps) {
+  // Note: params and searchParams are Promises in Next.js 15+
+  // We don't use them in this page, so we simply accept but ignore them
+  
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
