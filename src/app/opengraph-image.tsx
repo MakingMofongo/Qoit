@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 export const alt = "Qoit — The most beautiful way to go offline";
-export const size = { width: 1200, height: 630 };
+export const size = { width: 3840, height: 2160 };
 export const contentType = "image/png";
 
 export default async function Image() {
@@ -25,10 +25,10 @@ export default async function Image() {
         <div
           style={{
             position: "absolute",
-            top: -100,
-            right: -100,
-            width: 400,
-            height: 400,
+            top: -320,
+            right: -320,
+            width: 1280,
+            height: 1280,
             background: "radial-gradient(circle, rgba(201, 169, 98, 0.15) 0%, transparent 70%)",
             borderRadius: "50%",
           }}
@@ -36,10 +36,10 @@ export default async function Image() {
         <div
           style={{
             position: "absolute",
-            bottom: -100,
-            left: -100,
-            width: 350,
-            height: 350,
+            bottom: -320,
+            left: -320,
+            width: 1120,
+            height: 1120,
             background: "radial-gradient(circle, rgba(74, 93, 74, 0.12) 0%, transparent 70%)",
             borderRadius: "50%",
           }}
@@ -50,14 +50,14 @@ export default async function Image() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 16,
-            marginBottom: 48,
+            gap: 51,
+            marginBottom: 154,
           }}
         >
           <div
             style={{
-              width: 56,
-              height: 56,
+              width: 179,
+              height: 179,
               borderRadius: "50%",
               background: "#1a1915",
               display: "flex",
@@ -67,8 +67,8 @@ export default async function Image() {
           >
             <div
               style={{
-                width: 18,
-                height: 18,
+                width: 58,
+                height: 58,
                 borderRadius: "50%",
                 background: "#faf9f7",
               }}
@@ -76,13 +76,13 @@ export default async function Image() {
           </div>
           <span
             style={{
-              fontSize: 36,
+              fontSize: 115,
               fontWeight: 600,
               color: "#1a1915",
               letterSpacing: "-0.02em",
             }}
           >
-            qoit
+            qoit.page
           </span>
         </div>
 
@@ -92,12 +92,12 @@ export default async function Image() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 16,
+            gap: 51,
           }}
         >
           <h1
             style={{
-              fontSize: 72,
+              fontSize: 230,
               fontWeight: 600,
               color: "#1a1915",
               margin: 0,
@@ -110,7 +110,7 @@ export default async function Image() {
           </h1>
           <h1
             style={{
-              fontSize: 72,
+              fontSize: 230,
               fontWeight: 600,
               color: "#1a1915",
               margin: 0,
@@ -119,7 +119,7 @@ export default async function Image() {
               lineHeight: 1.1,
               display: "flex",
               alignItems: "center",
-              gap: 16,
+              gap: 51,
             }}
           >
             way to go{" "}
@@ -131,12 +131,12 @@ export default async function Image() {
               <span
                 style={{
                   position: "absolute",
-                  bottom: 8,
+                  bottom: 26,
                   left: 0,
                   right: 0,
-                  height: 12,
+                  height: 38,
                   background: "rgba(201, 169, 98, 0.4)",
-                  borderRadius: 6,
+                  borderRadius: 19,
                 }}
               />
               <span style={{ position: "relative" }}>offline</span>
@@ -147,9 +147,9 @@ export default async function Image() {
         {/* Tagline */}
         <p
           style={{
-            fontSize: 28,
+            fontSize: 90,
             color: "#8a8780",
-            marginTop: 32,
+            marginTop: 102,
             letterSpacing: "-0.01em",
           }}
         >
@@ -160,24 +160,28 @@ export default async function Image() {
         <div
           style={{
             display: "flex",
-            alignItems: "flex-end",
-            gap: 4,
-            marginTop: 48,
-            height: 32,
+            alignItems: "center",
+            gap: 13,
+            marginTop: 154,
+            height: 204,
           }}
         >
-          {[0.3, 0.5, 0.8, 1, 0.7, 0.4, 0.6, 0.9, 0.5, 0.3, 0.2, 0.15, 0.1, 0.08, 0.05, 0.05].map(
-            (scale, i) => (
-              <div
-                key={i}
-                style={{
-                  width: 4,
-                  height: 32 * scale,
-                  background: "#8a8780",
-                  borderRadius: 2,
-                }}
-              />
-            )
+          {[0.3, 0.5, 0.8, 1, 0.7, 0.4, 0.6, 0.9, 0.5, 0.3, 0.2, 0.15, 0.1, 0.08, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.02, 0.02, 0.02, 0.02, 0.015, 0.015, 0.015, 0.01, 0.01, 0.01, 0.01, 0.01].map(
+            (scale, i) => {
+              const isDot = scale <= 0.05;
+              const size = isDot ? 8 : 204 * scale;
+              return (
+                <div
+                  key={i}
+                  style={{
+                    width: isDot ? 8 : 13,
+                    height: isDot ? 8 : size,
+                    background: "#8a8780",
+                    borderRadius: isDot ? 4 : 6,
+                  }}
+                />
+              );
+            }
           )}
         </div>
       </div>

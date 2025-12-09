@@ -12,6 +12,7 @@
     "@types/three": "^0.181.0",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.23.25",
+    "html-to-image": "^1.11.13",
     "next": "16.0.7",
     "react": "19.2.0",
     "react-dom": "19.2.0",

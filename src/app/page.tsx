@@ -10,7 +10,6 @@ import { TestimonialsSection } from "@/components/sections/testimonials-section"
 import { HowItWorksSection } from "@/components/sections/how-it-works-section";
 import { FAQSection } from "@/components/sections/faq-section";
 import { ManifestoSection } from "@/components/sections/manifesto-section";
-import { StatsSection } from "@/components/sections/stats-section";
 import { FinalCTASection } from "@/components/sections/final-cta-section";
 import { Footer } from "@/components/sections/footer";
 import type { PageProps } from "@/types";
@@ -32,7 +31,6 @@ export default function Home(_props: PageProps) {
       <HowItWorksSection />
       <FAQSection />
       <ManifestoSection />
-      <StatsSection />
       <FinalCTASection />
       <Footer />
     </div>

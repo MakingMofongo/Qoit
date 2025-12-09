@@ -8,6 +8,27 @@ config({ path: resolve(process.cwd(), "qoit.env") });
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// GET: Fetch waitlist count
+const BASE_COUNT = 253; // Starting offset
+
+export async function GET() {
+  try {
+    // Fetch all contacts (Resend returns up to 100 by default)
+    const { data, error } = await resend.contacts.list();
+
+    if (error) {
+      console.error("Resend error:", error);
+      return NextResponse.json({ count: BASE_COUNT });
+    }
+
+    const count = (data?.data?.length || 0) + BASE_COUNT;
+    return NextResponse.json({ count });
+  } catch (error) {
+    console.error("Waitlist count error:", error);
+    return NextResponse.json({ count: BASE_COUNT });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const { email } = await request.json();
