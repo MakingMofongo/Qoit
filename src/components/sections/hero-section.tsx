@@ -6,6 +6,9 @@ import { ShaderAnimation } from "@/components/ui/shader-animation";
 import { EmailSignup } from "@/components/email-signup";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 
+// Product Hunt launch date: December 10th, 2025 12:01 AM PST (08:01 UTC)
+const LAUNCH_DATE = new Date("2025-12-10T08:01:00Z");
+
 export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
@@ -13,6 +16,17 @@ export function HeroSection() {
   const heroY = useTransform(scrollYProgress, [0, 0.15], [0, -30]);
   
   const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
+  const [isLaunched, setIsLaunched] = useState(false);
+  
+  useEffect(() => {
+    // Check if launched
+    const checkLaunch = () => setIsLaunched(new Date() >= LAUNCH_DATE);
+    checkLaunch();
+    
+    // Re-check every minute in case user is on page during launch
+    const interval = setInterval(checkLaunch, 60000);
+    return () => clearInterval(interval);
+  }, []);
   
   useEffect(() => {
     fetch("/api/waitlist")
@@ -44,19 +58,38 @@ export function HeroSection() {
       {/* Main content */}
       <div className="max-w-3xl mx-auto relative z-10 text-center">
         <motion.div style={{ opacity: heroOpacity, y: heroY }}>
-          {/* Pill badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            className="inline-flex items-center gap-2.5 bg-[#f5f4f0] border border-[#e8e6e1] rounded-full px-4 py-2 mb-12"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-[#4a5d4a] opacity-75 animate-ping" style={{ animationDuration: "3s" }} />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4a5d4a]" />
-            </span>
-            <span className="text-sm text-[#8a8780]">Launching soon</span>
-          </motion.div>
+          {/* Status badge - time sensitive */}
+          {isLaunched ? (
+            <motion.a
+              href="https://www.producthunt.com/products/qoit?launch=qoit"
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="inline-flex items-center gap-2.5 bg-[#f5f4f0] border border-[#e8e6e1] rounded-full px-4 py-2 mb-12 hover:bg-[#eae9e5] transition-colors"
+            >
+              <img 
+                src="/product-hunt-logo-black-960.png" 
+                alt="Product Hunt" 
+                className="w-4 h-4 object-contain"
+              />
+              <span className="text-sm text-[#8a8780]">Live on <span className="font-medium text-[#1a1915]">Product Hunt</span></span>
+            </motion.a>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="inline-flex items-center gap-2.5 bg-[#f5f4f0] border border-[#e8e6e1] rounded-full px-4 py-2 mb-12"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-[#4a5d4a] opacity-75 animate-ping" style={{ animationDuration: "3s" }} />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4a5d4a]" />
+              </span>
+              <span className="text-sm text-[#8a8780]">Launching soon</span>
+            </motion.div>
+          )}
 
           {/* Main headline */}
           <motion.h1
@@ -145,11 +178,12 @@ export function HeroSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
-              className="flex items-center justify-center gap-2 text-sm text-[#8a8780]"
+              className="flex items-center justify-center gap-2 text-sm text-[#8a8780] mb-6"
             >
               <span>Join <span className="font-medium text-[#1a1915]"><AnimatedNumber value={waitlistCount} /></span> {waitlistCount === 1 ? "other" : "others"} on the waitlist</span>
             </motion.div>
           )}
+
         </motion.div>
       </div>
 
