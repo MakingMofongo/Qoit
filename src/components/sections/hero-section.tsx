@@ -22,7 +22,11 @@ export function HeroSection() {
         animate={{ opacity: 0 }}
         transition={{ delay: 2, duration: 1, ease: "easeOut" }}
       >
-        <ShaderAnimation className="w-full h-full" duration={3000} />
+        <ShaderAnimation 
+          className="w-full h-full" 
+          duration={3000} 
+          target={{ x: 0, y: 0.15 }}
+        />
       </motion.div>
       
       {/* Main content */}

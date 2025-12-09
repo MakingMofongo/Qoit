@@ -10,20 +10,23 @@ interface ShaderAnimationProps {
   duration?: number
   /** Callback when animation completes */
   onComplete?: () => void
+  /** Target position for convergence as normalized offset from center (-1 to 1) */
+  target?: { x: number; y: number }
 }
 
 export function ShaderAnimation({ 
   className = "w-full h-screen", 
   style,
   duration = 3000,
-  onComplete
+  onComplete,
+  target = { x: 0, y: 0 }
 }: ShaderAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<{
     camera: THREE.Camera
     scene: THREE.Scene
     renderer: THREE.WebGLRenderer
-    uniforms: { time: { type: string; value: number }; resolution: { type: string; value: THREE.Vector2 } }
+    uniforms: { time: { type: string; value: number }; resolution: { type: string; value: THREE.Vector2 }; target: { type: string; value: THREE.Vector2 } }
     animationId: number
     startTime: number
     stopped: boolean
@@ -41,7 +44,7 @@ export function ShaderAnimation({
       }
     `
 
-    // Fragment shader - converging rings effect (starts from outside)
+    // Fragment shader - converging rings effect (starts from outside, converges to target)
     const fragmentShader = `
       #define TWO_PI 6.2831853072
       #define PI 3.14159265359
@@ -49,11 +52,14 @@ export function ShaderAnimation({
       precision highp float;
       uniform vec2 resolution;
       uniform float time;
+      uniform vec2 target;
 
       void main(void) {
         vec2 uv = (gl_FragCoord.xy * 2.0 - resolution.xy) / min(resolution.x, resolution.y);
+        // Offset UV so rings converge on target position
+        uv -= target;
         float rawT = time * 0.15;
-        // Ease-out: fast at first, slows as it approaches center, never quite reaches it
+        // Ease-out: fast at first, slows as it approaches target, never quite reaches it
         float t = 1.0 - exp(-rawT * 1.8);
         float lineWidth = 0.002;
 
@@ -63,7 +69,7 @@ export function ShaderAnimation({
         vec3 baseColor = vec3(0.1, 0.1, 0.09);
         vec3 accentColor = vec3(0.2, 0.2, 0.18);
         
-        // Ring distance based on eased time - starts from outside, converges toward center
+        // Ring distance based on eased time - starts from outside, converges toward target
         float ringDist = (1.0 - t) * 1.8;
         
         for(int j = 0; j < 3; j++){
@@ -88,6 +94,7 @@ export function ShaderAnimation({
     const uniforms = {
       time: { type: "f", value: 1.0 },
       resolution: { type: "v2", value: new THREE.Vector2() },
+      target: { type: "v2", value: new THREE.Vector2(target.x, target.y) },
     }
 
     const material = new THREE.ShaderMaterial({
@@ -175,7 +182,7 @@ export function ShaderAnimation({
         material.dispose()
       }
     }
-  }, [duration, onComplete])
+  }, [duration, onComplete, target.x, target.y])
 
   return (
     <div
