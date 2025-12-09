@@ -18,7 +18,7 @@ export function HeroSection() {
       
       {/* Shader background - handles its own fade internally */}
       <div className="absolute inset-0">
-        <ShaderAnimation className="w-full h-full" duration={3000} targetRef={quietRef} />
+        <ShaderAnimation className="w-full h-full" duration={5000} targetRef={quietRef} />
       </div>
       
       {/* Main content */}
@@ -53,7 +53,7 @@ export function HeroSection() {
               className="block text-[#1a1915]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.8, duration: 1.2 }}
+              transition={{ delay: 3, duration: 2 }}
             >
               quiet
             </motion.span>

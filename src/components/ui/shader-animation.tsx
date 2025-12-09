@@ -64,8 +64,8 @@ export function ShaderAnimation({
         vec2 uv = (gl_FragCoord.xy * 2.0 - resolution.xy) / min(resolution.x, resolution.y);
         uv -= targetOffset;
         
-        // Total animation: ~3 seconds = 9.0 time units at 0.05 per frame
-        float totalT = clamp(time / 9.0, 0.0, 1.0);
+        // Total animation: ~5 seconds = 15.0 time units at 0.05 per frame
+        float totalT = clamp(time / 15.0, 0.0, 1.0);
         
         // === LAYER 1: RING CONVERGENCE ===
         // Ease-out cubic for smooth deceleration - rings converge fully to center
