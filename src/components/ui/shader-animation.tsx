@@ -10,27 +10,20 @@ interface ShaderAnimationProps {
   duration?: number
   /** Callback when animation completes */
   onComplete?: () => void
-  /** Target element ref to converge animation toward */
-  targetRef?: React.RefObject<HTMLElement | null>
 }
 
 export function ShaderAnimation({ 
   className = "w-full h-screen", 
   style,
   duration = 3000,
-  onComplete,
-  targetRef
+  onComplete
 }: ShaderAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<{
     camera: THREE.Camera
     scene: THREE.Scene
     renderer: THREE.WebGLRenderer
-    uniforms: { 
-      time: { type: string; value: number }
-      resolution: { type: string; value: THREE.Vector2 }
-      targetOffset: { type: string; value: THREE.Vector2 }
-    }
+    uniforms: { time: { type: string; value: number }; resolution: { type: string; value: THREE.Vector2 } }
     animationId: number
     startTime: number
     stopped: boolean
@@ -56,49 +49,32 @@ export function ShaderAnimation({
       precision highp float;
       uniform vec2 resolution;
       uniform float time;
-      uniform vec2 targetOffset;
 
       void main(void) {
-        // Calculate UV with target offset applied
-        // targetOffset is in normalized coords (-1 to 1) where 0,0 is center
         vec2 uv = (gl_FragCoord.xy * 2.0 - resolution.xy) / min(resolution.x, resolution.y);
-        uv -= targetOffset;
-        
-        // Total animation: ~5 seconds = 15.0 time units at 0.05 per frame
-        float totalT = clamp(time / 15.0, 0.0, 1.0);
-        
-        // === LAYER 1: RING CONVERGENCE ===
-        // Ease-out cubic for smooth deceleration - rings converge fully to center
-        float ringT = 1.0 - pow(1.0 - totalT, 3.0);
-        
+        float rawT = time * 0.15;
+        // Ease-out: fast at first, slows as it approaches center, never quite reaches it
+        float t = 1.0 - exp(-rawT * 1.8);
         float lineWidth = 0.002;
-        vec3 ringColor = vec3(0.0);
+
+        vec3 color = vec3(0.0);
         
-        // Soft muted tones - subtle warmth to match light cream background
-        vec3 baseColor = vec3(0.6, 0.58, 0.55);
-        vec3 accentColor = vec3(0.7, 0.68, 0.65);
+        // Dark charcoal tones for contrast
+        vec3 baseColor = vec3(0.1, 0.1, 0.09);
+        vec3 accentColor = vec3(0.2, 0.2, 0.18);
         
-        // Ring distance - starts at 1.5, converges fully to 0 (center/nothing)
-        float ringDist = (1.0 - ringT) * 1.5;
+        // Ring distance based on eased time - starts from outside, converges toward center
+        float ringDist = (1.0 - t) * 1.8;
         
         for(int j = 0; j < 3; j++){
           for(int i = 0; i < 5; i++){
             float offset = 0.01*float(j) + float(i)*0.015;
             float val = lineWidth * float(i*i) / abs(ringDist + offset - length(uv) + mod(uv.x+uv.y, 0.2));
-            ringColor += mix(baseColor, accentColor, float(j) * 0.3) * val;
+            color += mix(baseColor, accentColor, float(j) * 0.3) * val;
           }
         }
         
-        // === LAYER 2: BACKGROUND FADE ===
-        // Background fades out over same duration, ending when rings end
-        // Starts fading at 60%, completes at 100% - synchronized with ring completion
-        float fadeT = clamp((totalT - 0.6) / 0.4, 0.0, 1.0);
-        float bgOpacity = 1.0 - fadeT;
-        
-        // Output: rings render at full intensity, background alpha fades
-        // Rings naturally disappear as they converge (ringDist -> 0)
-        // Background independently fades via alpha channel
-        gl_FragColor = vec4(ringColor, bgOpacity);
+        gl_FragColor = vec4(color, 1.0);
       }
     `
 
@@ -112,39 +88,7 @@ export function ShaderAnimation({
     const uniforms = {
       time: { type: "f", value: 1.0 },
       resolution: { type: "v2", value: new THREE.Vector2() },
-      targetOffset: { type: "v2", value: new THREE.Vector2(0, 0) },
     }
-
-    // Calculate target offset from targetRef element position
-    const updateTargetOffset = () => {
-      if (!targetRef?.current || !containerRef.current) return
-      
-      const targetRect = targetRef.current.getBoundingClientRect()
-      const containerRect = containerRef.current.getBoundingClientRect()
-      
-      // Get the center of the target element
-      const targetCenterX = targetRect.left + targetRect.width / 2
-      const targetCenterY = targetRect.top + targetRect.height / 2
-      
-      // Get the center of the container
-      const containerCenterX = containerRect.left + containerRect.width / 2
-      const containerCenterY = containerRect.top + containerRect.height / 2
-      
-      // Calculate offset from container center to target center
-      // Normalize to the shader's coordinate space
-      const minDim = Math.min(containerRect.width, containerRect.height)
-      
-      // Convert pixel offset to normalized shader coordinates
-      // Multiply by 2 because shader UV ranges from -1 to 1
-      const offsetX = ((targetCenterX - containerCenterX) / minDim) * 2
-      // Y is inverted in WebGL (positive Y is up, but in DOM positive Y is down)
-      const offsetY = -((targetCenterY - containerCenterY) / minDim) * 2
-      
-      uniforms.targetOffset.value.set(offsetX, offsetY)
-    }
-
-    // Initial target offset calculation
-    updateTargetOffset()
 
     const material = new THREE.ShaderMaterial({
       uniforms: uniforms,
@@ -168,8 +112,6 @@ export function ShaderAnimation({
       renderer.setSize(width, height)
       uniforms.resolution.value.x = renderer.domElement.width
       uniforms.resolution.value.y = renderer.domElement.height
-      // Recalculate target offset on resize
-      updateTargetOffset()
     }
 
     // Initial resize
@@ -233,7 +175,7 @@ export function ShaderAnimation({
         material.dispose()
       }
     }
-  }, [duration, onComplete, targetRef])
+  }, [duration, onComplete])
 
   return (
     <div

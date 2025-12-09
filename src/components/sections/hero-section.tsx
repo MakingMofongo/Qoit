@@ -8,7 +8,6 @@ import { AnimatedNumber } from "@/components/ui/animated-number";
 
 export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const quietRef = useRef<HTMLSpanElement>(null);
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 0.15], [0, -30]);
@@ -16,10 +15,15 @@ export function HeroSection() {
   return (
     <section ref={containerRef} className="relative min-h-screen flex items-center justify-center px-6 pt-24 pb-16 overflow-hidden bg-[#faf9f7]">
       
-      {/* Shader background - handles its own fade internally */}
-      <div className="absolute inset-0">
-        <ShaderAnimation className="w-full h-full" duration={5000} targetRef={quietRef} />
-      </div>
+      {/* Shader background - fades out as "quiet" fades in */}
+      <motion.div 
+        className="absolute inset-0"
+        initial={{ opacity: 0.15 }}
+        animate={{ opacity: 0 }}
+        transition={{ delay: 2, duration: 1, ease: "easeOut" }}
+      >
+        <ShaderAnimation className="w-full h-full" duration={3000} />
+      </motion.div>
       
       {/* Main content */}
       <div className="max-w-3xl mx-auto relative z-10 text-center">
@@ -47,13 +51,12 @@ export function HeroSection() {
           >
             <span className="block text-[#8a8780]">The art of going</span>
             
-            {/* "quiet" - fades in as shader animation ends */}
+            {/* "quiet" - fades in as shader fades out */}
             <motion.span 
-              ref={quietRef}
               className="block text-[#1a1915]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 3, duration: 2 }}
+              transition={{ delay: 2.2, duration: 0.8 }}
             >
               quiet
             </motion.span>
