@@ -15,17 +15,20 @@ export function HeroSection() {
   return (
     <section ref={containerRef} className="relative min-h-screen flex items-center justify-center px-6 pt-24 pb-16 overflow-hidden bg-[#faf9f7]">
       
-      {/* Shader background - fades out as "quiet" fades in */}
+      {/* Shader background - converges onto "quiet", then snaps out */}
       <motion.div 
-        className="absolute inset-0"
-        initial={{ opacity: 0.15 }}
-        animate={{ opacity: 0 }}
-        transition={{ delay: 2, duration: 1, ease: "easeOut" }}
+        className="absolute inset-0 pointer-events-none"
+        initial={{ opacity: 0.25 }}
+        animate={{ opacity: 0, scale: 0.98 }}
+        transition={{ 
+          opacity: { delay: 2.2, duration: 0.3, ease: "easeIn" },
+          scale: { delay: 2.2, duration: 0.3, ease: "easeIn" }
+        }}
       >
         <ShaderAnimation 
           className="w-full h-full" 
           duration={3000} 
-          target={{ x: 0, y: 0.15 }}
+          target={{ x: 0, y: 0.05 }}
         />
       </motion.div>
       
@@ -55,15 +58,56 @@ export function HeroSection() {
           >
             <span className="block text-[#8a8780]">The art of going</span>
             
-            {/* "quiet" - fades in as shader fades out */}
-            <motion.span 
-              className="block text-[#1a1915]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 2.2, duration: 0.8 }}
-            >
-              quiet
-            </motion.span>
+            {/* "quiet" - emerges as rings give way */}
+            <span className="block relative overflow-visible">
+              {/* Text materializes from the convergence point */}
+              <motion.span 
+                className="relative inline-block text-[#1a1915]"
+                initial={{ 
+                  scale: 0.9,
+                  opacity: 0
+                }}
+                animate={{ 
+                  scale: 1,
+                  opacity: 1
+                }}
+                transition={{ 
+                  delay: 2.15,
+                  duration: 0.5,
+                  ease: [0.0, 0.0, 0.2, 1]
+                }}
+              >
+                {/* Letters spread out from center */}
+                {"quiet".split("").map((letter, i) => {
+                  const centerIndex = 2; // 'i' is center
+                  const distFromCenter = i - centerIndex;
+                  return (
+                    <motion.span
+                      key={i}
+                      className="inline-block"
+                      initial={{ 
+                        x: -distFromCenter * 15,
+                        filter: "blur(4px)",
+                        opacity: 0
+                      }}
+                      animate={{ 
+                        x: 0,
+                        filter: "blur(0px)",
+                        opacity: 1
+                      }}
+                      transition={{ 
+                        delay: 2.2 + Math.abs(distFromCenter) * 0.05,
+                        duration: 0.4,
+                        ease: [0.0, 0.0, 0.2, 1]
+                      }}
+                    >
+                      {letter}
+                    </motion.span>
+                  );
+                })}
+              </motion.span>
+              
+            </span>
           </motion.h1>
 
           {/* Subheadline */}
