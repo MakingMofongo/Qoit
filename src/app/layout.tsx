@@ -13,21 +13,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Quiet — The most beautiful way to go offline",
-  description: "Not 'out of office.' Not 'be right back.' Just... quiet. A personal status page for when you need the world to wait.",
+  title: "Qoit — The most beautiful way to go offline",
+  description: "Not 'out of office.' Not 'be right back.' Just... qoit. A personal status page for when you need the world to wait.",
   keywords: ["offline", "status page", "boundaries", "mental health", "work-life balance", "async", "remote work", "digital wellness"],
-  authors: [{ name: "Quiet" }],
+  authors: [{ name: "Qoit" }],
   openGraph: {
-    title: "Quiet — The most beautiful way to go offline",
-    description: "Not 'out of office.' Not 'be right back.' Just... quiet.",
+    title: "Qoit — The most beautiful way to go offline",
+    description: "Not 'out of office.' Not 'be right back.' Just... qoit.",
     type: "website",
-    siteName: "Quiet",
+    siteName: "Qoit",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Quiet — The most beautiful way to go offline",
-    description: "Not 'out of office.' Not 'be right back.' Just... quiet.",
-    creator: "@quietpage",
+    title: "Qoit — The most beautiful way to go offline",
+    description: "Not 'out of office.' Not 'be right back.' Just... qoit.",
+    creator: "@qoit_page",
   },
   robots: {
     index: true,

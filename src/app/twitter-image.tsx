@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Quiet — The most beautiful way to go offline";
+export const alt = "Qoit — The most beautiful way to go offline";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -82,7 +82,7 @@ export default async function Image() {
               letterSpacing: "-0.02em",
             }}
           >
-            quiet
+            qoit
           </span>
         </div>
 
@@ -153,7 +153,7 @@ export default async function Image() {
             letterSpacing: "-0.01em",
           }}
         >
-          Not "out of office." Just... quiet.
+          Not "out of office." Just... qoit.
         </p>
 
         {/* Sound wave visualization - fading out */}

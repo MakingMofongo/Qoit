@@ -75,9 +75,9 @@ function SoundWave({ muted = false, size = "default" }: { muted?: boolean; size?
 }
 
 // Status indicator
-function StatusDot({ status, pulse = true }: { status: "quiet" | "available" | "busy"; pulse?: boolean }) {
+function StatusDot({ status, pulse = true }: { status: "qoit" | "available" | "busy"; pulse?: boolean }) {
   const colors = {
-    quiet: "bg-[#4a5d4a]",
+    qoit: "bg-[#4a5d4a]",
     available: "bg-[#4a5d4a]",
     busy: "bg-[#c9a962]",
   };
@@ -97,10 +97,10 @@ function StatusDot({ status, pulse = true }: { status: "quiet" | "available" | "
 
 // Interactive status mode selector
 function StatusModes() {
-  const [activeMode, setActiveMode] = useState<"quiet" | "focused" | "away">("quiet");
+  const [activeMode, setActiveMode] = useState<"qoit" | "focused" | "away">("qoit");
   
   const modes = [
-    { id: "quiet" as const, label: "Quiet", desc: "Taking a breather", time: "Back in 2 days" },
+    { id: "qoit" as const, label: "Qoit", desc: "Taking a breather", time: "Back in 2 days" },
     { id: "focused" as const, label: "Deep Work", desc: "In the zone", time: "Available at 5pm" },
     { id: "away" as const, label: "Away", desc: "On vacation", time: "Returns Dec 20" },
   ];
@@ -143,7 +143,7 @@ function StatusModes() {
               >
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 rounded-full bg-[#e8e6e1] flex items-center justify-center">
-                    <StatusDot status="quiet" pulse={false} />
+                    <StatusDot status="qoit" pulse={false} />
                   </div>
                   <div>
                     <p className="font-medium text-lg">{mode.desc}</p>
@@ -196,7 +196,7 @@ function PreviewCard() {
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
-            quiet.page/maya
+            qoit.page/maya
           </div>
         </div>
       </div>
@@ -211,8 +211,8 @@ function PreviewCard() {
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-3">
-                <StatusDot status="quiet" />
-                <span className="text-sm font-medium text-[#4a5d4a]">Quiet Mode</span>
+                <StatusDot status="qoit" />
+                <span className="text-sm font-medium text-[#4a5d4a]">Qoit Mode</span>
               </div>
               <h3 className="text-2xl md:text-3xl font-semibold tracking-tight">Maya Chen</h3>
               <p className="text-[#8a8780]">Product Designer</p>
@@ -263,7 +263,7 @@ function PreviewCard() {
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <button className="flex-1 bg-[#1a1915] text-[#faf9f7] rounded-xl px-6 py-3 font-medium hover:bg-[#2a2925] transition-colors">
+            <button className="flex-1 bg-transparent text-[#8a8780] rounded-xl px-6 py-3 font-medium hover:text-[#1a1915] hover:bg-[#f5f4f0]/50 transition-colors border border-[#e8e6e1]/50">
               Leave a message
             </button>
             <button className="flex-1 border border-[#e8e6e1] rounded-xl px-6 py-3 font-medium hover:bg-[#f5f4f0] transition-colors flex items-center justify-center gap-2">
@@ -313,13 +313,11 @@ function Testimonial({
   quote,
   author,
   role,
-  avatar,
   delay = 0,
 }: {
   quote: string;
   author: string;
   role: string;
-  avatar?: string;
   delay?: number;
 }) {
   return (
@@ -352,11 +350,34 @@ function EmailSignup({ dark = false }: { dark?: boolean }) {
   const [email, setEmail] = useState("");
   const [focused, setFocused] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+
       setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to join waitlist");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -379,7 +400,7 @@ function EmailSignup({ dark = false }: { dark?: boolean }) {
         </motion.div>
         <h3 className="text-xl font-semibold mb-2">You're on the list</h3>
         <p className={dark ? "text-[#8a8780]" : "text-[#faf9f7]/70"}>
-          We'll reach out when it's your turn. Until then... enjoy the quiet.
+          We'll reach out when it's your turn. Until then... go qoit.
         </p>
       </motion.div>
     );
@@ -408,20 +429,39 @@ function EmailSignup({ dark = false }: { dark?: boolean }) {
               dark ? "text-[#faf9f7] placeholder:text-[#faf9f7]/40" : "placeholder:text-[#8a8780]"
             }`}
             required
+            disabled={loading}
           />
           <button
             type="submit"
+            disabled={loading}
             className={`${
-              dark ? "bg-[#faf9f7] text-[#1a1915] hover:bg-[#e8e6e1]" : "bg-[#1a1915] text-[#faf9f7] hover:bg-[#2a2925]"
-            } px-8 py-4 font-medium transition-colors sm:rounded-r-xl`}
+              dark ? "bg-[#faf9f7] text-[#1a1915] hover:bg-[#e8e6e1]" : "bg-transparent text-[#8a8780] hover:text-[#1a1915] hover:bg-[#f5f4f0]/50 border border-[#e8e6e1]/50"
+            } px-8 py-4 font-medium transition-colors sm:rounded-r-xl disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            Join Waitlist
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Joining...
+              </span>
+            ) : (
+              "Join Waitlist"
+            )}
           </button>
         </div>
       </motion.div>
+      {error && (
+        <p className={`text-xs mt-3 text-center sm:text-left text-red-500`}>
+          {error}
+        </p>
+      )}
+      {!error && (
       <p className={`text-xs mt-3 text-center sm:text-left ${dark ? "text-[#faf9f7]/40" : "text-[#8a8780]"}`}>
         No spam. Just one email when we launch.
       </p>
+      )}
     </form>
   );
 }
@@ -479,17 +519,17 @@ export default function Home() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="fixed top-0 left-0 right-0 z-50 px-6 py-4"
+        className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-[#faf9f7]/80 backdrop-blur-sm"
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-full bg-[#1a1915] flex items-center justify-center">
               <div className="w-2.5 h-2.5 rounded-full bg-[#faf9f7]" />
             </div>
-            <span className="font-semibold text-lg tracking-tight">quiet</span>
+            <span className="font-semibold text-lg tracking-tight">qoit</span>
           </div>
 
-          <button className="text-sm font-medium px-5 py-2.5 rounded-full bg-[#1a1915] text-[#faf9f7] hover:bg-[#2a2925] transition-colors">
+          <button className="text-sm font-medium px-5 py-2.5 rounded-full bg-transparent text-[#8a8780] hover:text-[#1a1915] hover:bg-[#f5f4f0]/50 transition-colors border border-[#e8e6e1]/50">
             Get Early Access
           </button>
         </div>
@@ -549,7 +589,7 @@ export default function Home() {
                 Not "out of office." Not "be right back."
               </p>
               <p className="text-xl md:text-2xl text-[#1a1915] max-w-2xl mx-auto leading-relaxed">
-                Just... <em className="not-italic font-medium">quiet.</em>
+                Just... <em className="not-italic font-medium">qoit.</em>
               </p>
             </motion.div>
 
@@ -575,7 +615,7 @@ export default function Home() {
                 </motion.div>
                 <div className="flex items-center gap-3">
                   <SoundWave muted={true} size="small" />
-                  <span className="text-xs uppercase tracking-wider font-medium text-[#1a1915]">Quiet</span>
+                  <span className="text-xs uppercase tracking-wider font-medium text-[#1a1915]">Qoit</span>
                 </div>
               </div>
             </motion.div>
@@ -639,7 +679,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <p className="text-sm text-[#8a8780] uppercase tracking-wider mb-4">Your quiet page</p>
+            <p className="text-sm text-[#8a8780] uppercase tracking-wider mb-4">Your qoit page</p>
             <h2 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight">
               A personal status page<br />
               <span className="text-[#8a8780]">that respects boundaries</span>
@@ -700,7 +740,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <p className="text-sm text-[#8a8780] uppercase tracking-wider mb-4">Why Quiet</p>
+            <p className="text-sm text-[#8a8780] uppercase tracking-wider mb-4">Why Qoit</p>
             <h2 className="text-3xl md:text-5xl font-semibold tracking-tight mb-6">
               Built for humans who need<br />
               <span className="text-[#8a8780]">to be human sometimes</span>
@@ -716,7 +756,7 @@ export default function Home() {
                 </svg>
               }
               title="One link. Every platform."
-              description="Drop your quiet.page link in your bio, email signature, or auto-responder. One source of truth for your availability."
+              description="Drop your qoit.page link in your bio, email signature, or auto-responder. One source of truth for your availability."
             />
             <Feature
               icon={
@@ -746,7 +786,7 @@ export default function Home() {
                   <line x1="3" y1="10" x2="21" y2="10" />
                 </svg>
               }
-              title="Schedule your quiet"
+              title="Schedule your qoit"
               description="Plan your offline time in advance. Automatic status updates when you need to disconnect."
             />
             <Feature
@@ -756,7 +796,7 @@ export default function Home() {
                 </svg>
               }
               title="Beautiful auto-responses"
-              description="Auto-reply with your quiet page link. People land somewhere beautiful, not a boring bounce message."
+              description="Auto-reply with your qoit page link. People land somewhere beautiful, not a boring bounce message."
             />
             <Feature
               icon={
@@ -788,7 +828,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 gap-6">
             <Testimonial
-              quote="I used to feel guilty every time I needed to unplug. Now I just share my quiet page and it says everything I couldn't."
+              quote="I used to feel guilty every time I needed to unplug. Now I just share my qoit page and it says everything I couldn't."
               author="Sarah Kim"
               role="Freelance Writer"
               delay={0}
@@ -806,7 +846,7 @@ export default function Home() {
               delay={0.2}
             />
             <Testimonial
-              quote="I put my quiet page in my email auto-responder during vacation. Zero anxiety about missing something important."
+              quote="I put my qoit page in my email auto-responder during vacation. Zero anxiety about missing something important."
               author="James O'Brien"
               role="Engineering Lead"
               delay={0.3}
@@ -832,7 +872,7 @@ export default function Home() {
             </h2>
             <p className="text-xl md:text-2xl text-[#8a8780] leading-relaxed max-w-2xl mx-auto">
               You are not "away." You are exactly where you need to be—just not 
-              here. Quiet is for the creators, the thinkers, the humans who know 
+              here. Qoit is for the creators, the thinkers, the humans who know 
               that the best things happen when you're not performing availability 
               for an audience.
             </p>
@@ -848,7 +888,7 @@ export default function Home() {
               { value: 2847, label: "On waitlist" },
               { value: 94, suffix: "%", label: "Feel less guilty" },
               { value: 3.2, suffix: "x", label: "Faster response when back" },
-              { value: 12, suffix: "h", label: "Avg. quiet time per week" },
+              { value: 12, suffix: "h", label: "Avg. qoit time per week" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -883,7 +923,7 @@ export default function Home() {
             </FloatingElement>
 
             <h2 className="text-4xl md:text-6xl font-semibold tracking-tight mb-6">
-              Ready to go quiet?
+              Ready to go qoit?
             </h2>
             <p className="text-xl text-[#faf9f7]/60 mb-12">
               Join the waitlist. We'll whisper when it's your turn.
@@ -907,16 +947,16 @@ export default function Home() {
             <div className="w-7 h-7 rounded-full bg-[#1a1915] flex items-center justify-center">
               <div className="w-2 h-2 rounded-full bg-[#faf9f7]" />
             </div>
-            <span className="font-medium">quiet</span>
+            <span className="font-medium">qoit</span>
           </div>
 
           <div className="flex items-center gap-8 text-sm text-[#8a8780]">
-            <a href="#" className="hover:text-[#1a1915] transition-colors">Twitter</a>
+            <a href="https://x.com/qoit_page" target="_blank" rel="noopener noreferrer" className="hover:text-[#1a1915] transition-colors">X</a>
             <a href="#" className="hover:text-[#1a1915] transition-colors">About</a>
             <a href="#" className="hover:text-[#1a1915] transition-colors">Privacy</a>
           </div>
 
-          <p className="text-sm text-[#8a8780]">© 2024 Quiet. <span className="italic">Shhh.</span></p>
+          <p className="text-sm text-[#8a8780]">© 2025 Qoit. <span className="italic">Shhh.</span></p>
         </div>
       </footer>
     </div>
