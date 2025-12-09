@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
+import { ShaderAnimation } from "@/components/ui/shader-animation";
 
 // Next.js 15+ page props - params and searchParams are now Promises
 type PageProps = {
@@ -171,6 +172,63 @@ function StatusModes() {
   );
 }
 
+// Compact hero preview card with Apple-style glass effect
+function HeroPreviewCard() {
+  return (
+    <motion.div
+      animate={{ y: [0, -8, 0] }}
+      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      className="relative"
+    >
+      {/* Glow behind card */}
+      <div className="absolute -inset-8 bg-gradient-to-br from-[#4a5d4a]/20 via-[#c9a962]/10 to-[#4a5d4a]/20 rounded-[40px] blur-2xl" />
+      
+      {/* Glass card */}
+      <div className="relative glass-card rounded-3xl p-6 md:p-8 shadow-2xl shadow-[#1a1915]/5 max-w-sm">
+        {/* Status header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#e8e6e1] to-[#d8d6d1] flex items-center justify-center">
+              <span className="text-lg font-medium text-[#8a8780]">M</span>
+            </div>
+            <div>
+              <p className="font-semibold text-[#1a1915]">Maya Chen</p>
+              <div className="flex items-center gap-2">
+                <StatusDot status="qoit" pulse />
+                <span className="text-xs text-[#4a5d4a] font-medium">Qoit Mode</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Countdown */}
+        <div className="bg-[#f5f4f0] rounded-2xl p-4 mb-5">
+          <p className="text-xs text-[#8a8780] uppercase tracking-wider mb-2">Back in</p>
+          <div className="flex items-baseline gap-1">
+            <span className="text-3xl font-semibold font-mono text-[#1a1915]">2</span>
+            <span className="text-[#8a8780] text-sm">d</span>
+            <span className="text-3xl font-semibold font-mono text-[#1a1915] ml-2">4</span>
+            <span className="text-[#8a8780] text-sm">h</span>
+          </div>
+        </div>
+
+        {/* Sound wave - muted state */}
+        <div className="flex items-center gap-3 text-[#8a8780] mb-5">
+          <SoundWave muted size="small" />
+          <span className="text-sm italic">Taking a creative break</span>
+        </div>
+
+        {/* Quick note */}
+        <div className="border-l-2 border-[#c9a962] pl-4">
+          <p className="text-[#1a1915] handwritten text-lg">
+            "Recharging creativity ✨"
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 // Preview card component
 function PreviewCard() {
   const [isHovered, setIsHovered] = useState(false);
@@ -313,6 +371,59 @@ function Feature({
           <p className="text-[#8a8780] leading-relaxed">{description}</p>
         </div>
       </div>
+    </motion.div>
+  );
+}
+
+// FAQ Item component with accordion
+function FAQItem({
+  question,
+  answer,
+  defaultOpen = false,
+}: {
+  question: string;
+  answer: string;
+  defaultOpen?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
+      className="border border-[#e8e6e1] rounded-2xl overflow-hidden hover:border-[#c9a962]/30 transition-colors"
+    >
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-6 py-5 flex items-center justify-between text-left bg-[#faf9f7] hover:bg-[#f5f4f0] transition-colors"
+      >
+        <span className="font-medium text-lg pr-4">{question}</span>
+        <motion.div
+          animate={{ rotate: isOpen ? 45 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="w-6 h-6 rounded-full bg-[#f5f4f0] flex items-center justify-center shrink-0"
+        >
+          <svg className="w-3.5 h-3.5 text-[#8a8780]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+          </svg>
+        </motion.div>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="px-6 pb-5 pt-0 text-[#8a8780] leading-relaxed">
+              {answer}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -541,87 +652,170 @@ export default function Home(_props: PageProps) {
             <span className="font-semibold text-lg tracking-tight">qoit</span>
           </div>
 
-          <button className="text-sm font-medium px-5 py-2.5 rounded-full bg-transparent text-[#8a8780] hover:text-[#1a1915] hover:bg-[#f5f4f0]/50 transition-colors border border-[#e8e6e1]/50">
+          <a 
+            href="#waitlist"
+            className="text-sm font-medium px-5 py-2.5 rounded-full bg-transparent text-[#8a8780] hover:text-[#1a1915] hover:bg-[#f5f4f0]/50 transition-colors border border-[#e8e6e1]/50"
+          >
             Get Early Access
-          </button>
+          </a>
         </div>
       </motion.nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - Apple-style layered design */}
       <section className="relative min-h-screen flex items-center justify-center px-6 pt-24 pb-16 overflow-hidden">
+        {/* Shader background - subtle and ambient */}
+        <div className="absolute inset-0 opacity-[0.08]">
+          <ShaderAnimation className="w-full h-full" />
+        </div>
+        
         {/* Background orbs */}
         <GradientOrb className="w-[600px] h-[600px] bg-[#c9a962] -top-48 -right-48" />
         <GradientOrb className="w-[500px] h-[500px] bg-[#4a5d4a] -bottom-32 -left-32" />
 
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <motion.div style={{ opacity: heroOpacity, y: heroY }}>
-            {/* Pill badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="inline-flex items-center gap-2.5 bg-[#f5f4f0] border border-[#e8e6e1] rounded-full px-4 py-2 mb-10"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-[#4a5d4a] opacity-75 animate-ping" style={{ animationDuration: "2s" }} />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4a5d4a]" />
-              </span>
-              <span className="text-sm text-[#8a8780]">Launching soon on Product Hunt</span>
-            </motion.div>
+        <div className="max-w-6xl mx-auto relative z-10">
+          <motion.div style={{ opacity: heroOpacity, y: heroY }} className="relative">
+            {/* Apple-style layered hero */}
+            <div className="relative flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+              
+              {/* Left: Main text content */}
+              <div className="flex-1 text-center lg:text-left">
+                {/* Pill badge */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                  className="inline-flex items-center gap-2.5 bg-[#f5f4f0] border border-[#e8e6e1] rounded-full px-4 py-2 mb-8"
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-[#4a5d4a] opacity-75 animate-ping" style={{ animationDuration: "2s" }} />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4a5d4a]" />
+                  </span>
+                  <span className="text-sm text-[#8a8780]">Launching soon</span>
+                </motion.div>
 
-            {/* Main headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[clamp(2.5rem,8vw,6rem)] font-semibold tracking-tight mb-8 leading-[1.08]"
-            >
-              The most beautiful
-              <br />
-              way to go{" "}
-              <span className="relative inline-block">
-                <span className="relative z-10">offline</span>
-                <motion.span
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 1, duration: 0.5 }}
-                  className="absolute bottom-[0.15em] left-0 right-0 h-[0.15em] bg-[#c9a962]/40 -z-10 origin-left rounded-full"
-                />
-              </span>
-            </motion.h1>
+                {/* Main headline - Playfair Display for elegance */}
+                <motion.h1
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-[clamp(2.5rem,7vw,5.5rem)] font-display font-semibold tracking-tight mb-6 leading-[1.05]"
+                >
+                  <span className="block">The art of</span>
+                  <span className="block relative">
+                    going{" "}
+                    <span className="relative inline-block">
+                      <span className="shimmer">quiet</span>
+                      <motion.span
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ delay: 1.2, duration: 0.6 }}
+                        className="absolute -bottom-1 left-0 right-0 h-[3px] bg-[#c9a962] origin-left rounded-full"
+                      />
+                    </span>
+                  </span>
+                </motion.h1>
 
-            {/* Subheadline */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-              className="mb-12"
-            >
-              <p className="text-xl md:text-2xl text-[#8a8780] max-w-2xl mx-auto leading-relaxed mb-1">
-                Not "out of office." Not "be right back."
-              </p>
-              <p className="text-xl md:text-2xl text-[#1a1915] max-w-2xl mx-auto leading-relaxed">
-                Just... <em className="not-italic font-medium">qoit.</em>
-              </p>
-            </motion.div>
+                {/* Subheadline */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, duration: 0.6 }}
+                  className="mb-10"
+                >
+                  <p className="text-lg md:text-xl text-[#8a8780] max-w-xl leading-relaxed">
+                    Not "out of office." Not "be right back."
+                    <br />
+                    <span className="text-[#1a1915] font-medium">Just... qoit.</span>
+                  </p>
+                </motion.div>
 
-            {/* Sound wave animation */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9, duration: 0.8 }}
-              className="flex justify-center mb-14 text-[#8a8780]"
-            >
-              <div className="flex items-center gap-8 bg-[#f5f4f0] rounded-full px-8 py-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs uppercase tracking-wider">Always on</span>
-                  <SoundWave muted={false} size="small" />
-                </div>
+                {/* CTA */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8, duration: 0.6 }}
+                  className="max-w-md mx-auto lg:mx-0"
+                >
+                  <EmailSignup />
+                </motion.div>
+
+                {/* Social proof */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 1.3 }}
-                  className="text-2xl"
+                  transition={{ delay: 1.1 }}
+                  className="mt-8 flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-3 sm:gap-5 text-sm text-[#8a8780]"
+                >
+                  <div className="flex -space-x-2.5">
+                    {["S", "M", "P", "J"].map((initial, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 1.2 + i * 0.1 }}
+                        className="w-9 h-9 rounded-full bg-gradient-to-br from-[#e8e6e1] to-[#d8d6d1] border-2 border-[#faf9f7] flex items-center justify-center text-xs font-medium text-[#8a8780]"
+                      >
+                        {initial}
+                      </motion.div>
+                    ))}
+                  </div>
+                  <span>Join <span className="font-medium text-[#1a1915]"><AnimatedNumber value={2847} /></span> on the waitlist</span>
+                </motion.div>
+              </div>
+
+              {/* Right: Floating preview card with Apple-style layering */}
+              <motion.div
+                initial={{ opacity: 0, x: 50, rotateY: -10 }}
+                animate={{ opacity: 1, x: 0, rotateY: 0 }}
+                transition={{ delay: 0.6, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                className="flex-1 relative perspective-1000 hidden lg:block"
+              >
+                {/* Layered "behind" text - Apple style */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.06 }}
+                  transition={{ delay: 1.5, duration: 1 }}
+                  className="absolute -top-16 -left-8 font-display text-[12rem] font-bold text-[#1a1915] leading-none select-none pointer-events-none z-0"
+                  style={{ transform: 'translateZ(-50px)' }}
+                >
+                  q
+                </motion.div>
+                
+                {/* The card itself - appears in front */}
+                <div className="relative z-10">
+                  <HeroPreviewCard />
+                </div>
+                
+                {/* Layered "behind" text - right side */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.04 }}
+                  transition={{ delay: 1.7, duration: 1 }}
+                  className="absolute -bottom-8 -right-12 font-display text-[10rem] font-bold text-[#1a1915] leading-none select-none pointer-events-none z-20"
+                  style={{ transform: 'translateZ(20px)' }}
+                >
+                  ·
+                </motion.div>
+              </motion.div>
+            </div>
+
+            {/* Sound wave - centered below on mobile, integrated on desktop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1, duration: 0.8 }}
+              className="flex justify-center mt-16 lg:mt-20 text-[#8a8780]"
+            >
+              <div className="flex items-center gap-6 md:gap-8 bg-[#f5f4f0]/80 backdrop-blur-sm rounded-full px-6 md:px-8 py-4 border border-[#e8e6e1]/50">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs uppercase tracking-wider hidden sm:inline">Always on</span>
+                  <SoundWave muted={false} size="small" />
+                </div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.4 }}
+                  className="text-xl text-[#c9a962]"
                 >
                   →
                 </motion.div>
@@ -630,36 +824,6 @@ export default function Home(_props: PageProps) {
                   <span className="text-xs uppercase tracking-wider font-medium text-[#1a1915]">Qoit</span>
                 </div>
               </div>
-            </motion.div>
-
-            {/* CTA */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1, duration: 0.6 }}
-              className="max-w-md mx-auto"
-            >
-              <EmailSignup />
-            </motion.div>
-
-            {/* Social proof */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.3 }}
-              className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm text-[#8a8780]"
-            >
-              <div className="flex -space-x-2.5">
-                {["S", "M", "P", "J"].map((initial, i) => (
-                  <div
-                    key={i}
-                    className="w-9 h-9 rounded-full bg-gradient-to-br from-[#e8e6e1] to-[#d8d6d1] border-2 border-[#faf9f7] flex items-center justify-center text-xs font-medium text-[#8a8780]"
-                  >
-                    {initial}
-                  </div>
-                ))}
-              </div>
-              <span>Join <span className="font-medium text-[#1a1915]"><AnimatedNumber value={2847} /></span> others on the waitlist</span>
             </motion.div>
           </motion.div>
         </div>
@@ -692,7 +856,7 @@ export default function Home(_props: PageProps) {
             className="text-center mb-16"
           >
             <p className="text-sm text-[#8a8780] uppercase tracking-wider mb-4">Your qoit page</p>
-            <h2 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight">
+            <h2 className="text-3xl md:text-5xl font-display font-semibold tracking-tight leading-tight">
               A personal status page<br />
               <span className="text-[#8a8780]">that respects boundaries</span>
             </h2>
@@ -734,7 +898,7 @@ export default function Home(_props: PageProps) {
             className="text-center mb-16"
           >
             <p className="text-sm text-[#8a8780] uppercase tracking-wider mb-4">Modes</p>
-            <h2 className="text-3xl md:text-5xl font-semibold tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-display font-semibold tracking-tight">
               Your status, your way
             </h2>
           </motion.div>
@@ -753,7 +917,7 @@ export default function Home(_props: PageProps) {
             className="text-center mb-20"
           >
             <p className="text-sm text-[#8a8780] uppercase tracking-wider mb-4">Why Qoit</p>
-            <h2 className="text-3xl md:text-5xl font-semibold tracking-tight mb-6">
+            <h2 className="text-3xl md:text-5xl font-display font-semibold tracking-tight mb-6">
               Built for humans who need<br />
               <span className="text-[#8a8780]">to be human sometimes</span>
             </h2>
@@ -833,7 +997,7 @@ export default function Home(_props: PageProps) {
             className="text-center mb-16"
           >
             <p className="text-sm text-[#8a8780] uppercase tracking-wider mb-4">Early voices</p>
-            <h2 className="text-3xl md:text-5xl font-semibold tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-display font-semibold tracking-tight">
               People who get it
             </h2>
           </motion.div>
@@ -867,6 +1031,126 @@ export default function Home(_props: PageProps) {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section className="py-28 px-6 bg-[#1a1915] text-[#faf9f7]">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <p className="text-sm text-[#faf9f7]/50 uppercase tracking-wider mb-4">How it works</p>
+            <h2 className="text-3xl md:text-5xl font-display font-semibold tracking-tight">
+              Three steps to peace
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+            {[
+              {
+                step: "01",
+                title: "Create your page",
+                description: "Set up your personal qoit.page in minutes. Choose your style, set your defaults.",
+                icon: (
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M12 4v16m8-8H4" strokeLinecap="round" />
+                  </svg>
+                ),
+              },
+              {
+                step: "02", 
+                title: "Share once",
+                description: "Add your link to email signatures, bios, auto-responders. One link for everything.",
+                icon: (
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" strokeLinecap="round" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" strokeLinecap="round" />
+                  </svg>
+                ),
+              },
+              {
+                step: "03",
+                title: "Go qoit",
+                description: "Toggle your status when you need space. Your page tells the world you're present—just elsewhere.",
+                icon: (
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" strokeLinecap="round" />
+                  </svg>
+                ),
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.15, duration: 0.6 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                {/* Connector line */}
+                {i < 2 && (
+                  <div className="hidden md:block absolute top-12 left-full w-full h-px bg-gradient-to-r from-[#faf9f7]/20 to-transparent" />
+                )}
+                
+                <div className="bg-[#faf9f7]/5 rounded-3xl p-8 border border-[#faf9f7]/10 hover:border-[#c9a962]/30 transition-colors h-full">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 rounded-2xl bg-[#faf9f7]/10 flex items-center justify-center text-[#c9a962]">
+                      {item.icon}
+                    </div>
+                    <span className="text-xs font-mono text-[#faf9f7]/40">{item.step}</span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3">{item.title}</h3>
+                  <p className="text-[#faf9f7]/60 leading-relaxed">{item.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-28 px-6">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <p className="text-sm text-[#8a8780] uppercase tracking-wider mb-4">FAQ</p>
+            <h2 className="text-3xl md:text-5xl font-display font-semibold tracking-tight">
+              Questions answered
+            </h2>
+          </motion.div>
+
+          <div className="space-y-4">
+            <FAQItem
+              question="How is this different from an auto-responder?"
+              answer="Auto-responders are reactive and often ignored. Your qoit page is proactive—a beautiful destination that respects both your time and theirs. People land somewhere thoughtfully designed, not a boring bounce message."
+              defaultOpen
+            />
+            <FAQItem
+              question="Is this just for remote workers?"
+              answer="Anyone who needs boundaries benefits from qoit. Whether you're a freelancer, founder, creative, or parent—if you've ever felt guilty about needing space, this is for you."
+            />
+            <FAQItem
+              question="What about actual emergencies?"
+              answer="You define what counts as urgent. Set up an emergency contact option that bypasses your qoit status—only for what truly can't wait. You stay in control."
+            />
+            <FAQItem
+              question="Can I schedule my qoit time?"
+              answer="Yes! Plan your offline time in advance. Set recurring qoit periods, vacation modes, or deep work blocks. Your status updates automatically."
+            />
+            <FAQItem
+              question="What does qoit even mean?"
+              answer="It's quiet, reimagined. Not a hard stop—just a soft pause. A gentle signal that you're present in the world, just not here right now."
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Manifesto Section */}
       <section className="py-28 px-6 bg-[#f5f4f0]">
         <div className="max-w-4xl mx-auto text-center">
@@ -877,7 +1161,7 @@ export default function Home(_props: PageProps) {
             viewport={{ once: true }}
           >
             <p className="text-sm text-[#8a8780] uppercase tracking-wider mb-10">Our belief</p>
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.15] mb-10">
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-semibold tracking-tight leading-[1.15] mb-10">
               Silence is not absence.
               <br />
               <span className="text-[#8a8780]">It's presence elsewhere.</span>
@@ -920,7 +1204,7 @@ export default function Home(_props: PageProps) {
       </section>
 
       {/* Final CTA */}
-      <section className="py-28 px-6 bg-[#1a1915] text-[#faf9f7]">
+      <section id="waitlist" className="py-28 px-6 bg-[#1a1915] text-[#faf9f7]">
         <div className="max-w-2xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -934,7 +1218,7 @@ export default function Home(_props: PageProps) {
               </div>
             </FloatingElement>
 
-            <h2 className="text-4xl md:text-6xl font-semibold tracking-tight mb-6">
+            <h2 className="text-4xl md:text-6xl font-display font-semibold tracking-tight mb-6">
               Ready to go qoit?
             </h2>
             <p className="text-xl text-[#faf9f7]/60 mb-12">

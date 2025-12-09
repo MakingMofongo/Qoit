@@ -19,6 +19,7 @@
   --color-warm: var(--warm);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-playfair);
 }
 
 * {
@@ -142,4 +143,84 @@ img {
 button,
 [role="button"] {
   user-select: none;
+}
+
+/* Display font for headlines */
+.font-display {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+
+/* Apple-style layering mask for text behind elements */
+.text-layer-mask {
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Glassmorphism card effect */
+.glass-card {
+  background: rgba(250, 249, 247, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(232, 230, 225, 0.5);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Layered text reveal effect - Apple style */
+.layer-reveal {
+  position: relative;
+}
+
+.layer-reveal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  mask: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+  -webkit-mask: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(135deg, var(--foreground) 0%, var(--quiet-green) 50%, var(--quiet-amber) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Shimmer animation for premium feel */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--foreground) 0%,
+    var(--quiet-amber) 25%,
+    var(--foreground) 50%,
+    var(--quiet-amber) 75%,
+    var(--foreground) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 8s linear infinite;
 }
