@@ -1,0 +1,28 @@
+{
+  "display_information": {
+    "name": "Qoit",
+    "description": "Sync your availability status from Qoit to Slack",
+    "background_color": "#4a5d4a",
+    "long_description": "Qoit helps you go quiet everywhere with one toggle. When you change your status on Qoit, it automatically syncs to your Slack status - so your team always knows when you're in deep work, away, or available."
+  },
+  "oauth_config": {
+    "redirect_urls": [
+      "https://qoit.page/api/integrations/slack/callback",
+      "http://localhost:3000/api/integrations/slack/callback"
+    ],
+    "scopes": {
+      "user": [
+        "users.profile:write",
+        "users.profile:read",
+        "users:read",
+        "users:write"
+      ]
+    }
+  },
+  "settings": {
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}
+

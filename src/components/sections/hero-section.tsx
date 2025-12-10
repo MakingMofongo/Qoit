@@ -3,7 +3,6 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { ShaderAnimation } from "@/components/ui/shader-animation";
-import { EmailSignup } from "@/components/email-signup";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 
 // Product Hunt launch date: December 10th, 2025 12:01 AM PST (08:01 UTC)
@@ -159,7 +158,7 @@ export function HeroSection() {
             transition={{ delay: 0.5, duration: 0.6 }}
             className="text-lg md:text-xl text-[#8a8780] max-w-lg mx-auto mb-12"
           >
-            A personal status page for when you need the world to wait.
+            One toggle to go quiet everywhere. Sync your status to Slack, Calendar, and more.
           </motion.p>
 
           {/* CTA */}
@@ -167,9 +166,20 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.6 }}
-            className="max-w-md mx-auto mb-8"
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto mb-8"
           >
-            <EmailSignup />
+            <a
+              href="/signup"
+              className="w-full sm:w-auto px-8 py-4 bg-[#1a1915] text-[#faf9f7] rounded-2xl font-medium hover:bg-[#2a2925] transition-colors text-center"
+            >
+              Create your page
+            </a>
+            <a
+              href="/login"
+              className="w-full sm:w-auto px-8 py-4 bg-transparent text-[#8a8780] rounded-2xl font-medium hover:text-[#1a1915] hover:bg-[#f5f4f0] transition-colors border border-[#e8e6e1] text-center"
+            >
+              Sign in
+            </a>
           </motion.div>
 
           {/* Social proof - only show if there are waitlist signups */}
@@ -180,7 +190,7 @@ export function HeroSection() {
               transition={{ delay: 1 }}
               className="flex items-center justify-center gap-2 text-sm text-[#8a8780] mb-6"
             >
-              <span>Join <span className="font-medium text-[#1a1915]"><AnimatedNumber value={waitlistCount} /></span> {waitlistCount === 1 ? "other" : "others"} on the waitlist</span>
+              <span>Join <span className="font-medium text-[#1a1915]"><AnimatedNumber value={waitlistCount} /></span> {waitlistCount === 1 ? "other" : "others"} already using Qoit</span>
             </motion.div>
           )}
 

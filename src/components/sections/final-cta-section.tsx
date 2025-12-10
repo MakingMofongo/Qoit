@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FloatingElement } from "@/components/ui/floating-element";
-import { EmailSignup } from "@/components/email-signup";
+import Link from "next/link";
 
 export function FinalCTASection() {
   return (
@@ -24,19 +24,29 @@ export function FinalCTASection() {
             Ready to go qoit?
           </h2>
           <p className="text-xl text-[#faf9f7]/60 mb-12">
-            Join the waitlist. We'll whisper when it's your turn.
+            Create your personal status page in minutes.
           </p>
 
-          <div className="max-w-md mx-auto">
-            <EmailSignup dark />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
+            <Link
+              href="/signup"
+              className="w-full sm:w-auto px-8 py-4 bg-[#faf9f7] text-[#1a1915] rounded-2xl font-medium hover:bg-[#e8e6e1] transition-colors text-lg"
+            >
+              Create your page
+            </Link>
+            <Link
+              href="/login"
+              className="w-full sm:w-auto px-8 py-4 bg-transparent text-[#faf9f7]/70 rounded-2xl font-medium hover:text-[#faf9f7] hover:bg-[#faf9f7]/10 transition-colors border border-[#faf9f7]/20"
+            >
+              Sign in
+            </Link>
           </div>
 
           <p className="text-sm text-[#faf9f7]/40 mt-8">
-            Free during beta. No credit card required.
+            Free to use. No credit card required.
           </p>
         </motion.div>
       </div>
     </section>
   );
 }
-

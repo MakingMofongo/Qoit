@@ -224,3 +224,35 @@ button,
   -webkit-text-fill-color: transparent;
   animation: shimmer 8s linear infinite;
 }
+
+/* React Day Picker dropdown styles */
+.rdp-dropdown {
+  appearance: none;
+  background: #1a1915;
+  border: 1px solid #3a3935;
+  border-radius: 0.5rem;
+  padding: 0.25rem 1.5rem 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  color: #faf9f7;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a8780' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.25rem center;
+}
+
+.rdp-dropdown:focus {
+  outline: none;
+  ring: 2px solid #4a5d4a;
+  border-color: #4a5d4a;
+}
+
+.rdp-dropdown option {
+  background: #1a1915;
+  color: #faf9f7;
+}
+
+.rdp-dropdowns {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
