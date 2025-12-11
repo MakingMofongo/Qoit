@@ -2,19 +2,25 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import { format } from "date-fns";
 
 interface DiscordMockupProps {
   isQoit: boolean;
+  backAtTime: Date | null;
   animationDelay: number;
 }
 
-export function DiscordMockup({ isQoit, animationDelay }: DiscordMockupProps) {
+export function DiscordMockup({ isQoit, backAtTime, animationDelay }: DiscordMockupProps) {
   const [localState, setLocalState] = useState(isQoit);
+  const [localBackAtTime, setLocalBackAtTime] = useState<Date | null>(backAtTime);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLocalState(isQoit), animationDelay * 1000);
+    const timer = setTimeout(() => {
+      setLocalState(isQoit);
+      setLocalBackAtTime(backAtTime);
+    }, animationDelay * 1000);
     return () => clearTimeout(timer);
-  }, [isQoit, animationDelay]);
+  }, [isQoit, backAtTime, animationDelay]);
 
   const now = new Date();
   const timeStr = now.toLocaleTimeString("en-US", {
@@ -22,6 +28,23 @@ export function DiscordMockup({ isQoit, animationDelay }: DiscordMockupProps) {
     minute: "2-digit",
     hour12: true,
   });
+
+  // Format back at time for display (include date if not today)
+  const formatBackAt = (date: Date | null) => {
+    if (!date) return "";
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    const isTomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString() === date.toDateString();
+    
+    if (isToday) {
+      return format(date, "h:mm a");
+    } else if (isTomorrow) {
+      return `Tomorrow, ${format(date, "h:mm a")}`;
+    } else {
+      return format(date, "EEE, MMM d, h:mm a");
+    }
+  };
+  const backAtStr = formatBackAt(localBackAtTime);
 
   return (
     <motion.div
@@ -78,7 +101,9 @@ export function DiscordMockup({ isQoit, animationDelay }: DiscordMockupProps) {
                   </span>
                 </div>
                 <p className="text-xs text-[#b5bac1]">
-                  Status changed to {localState ? "Focus Mode" : "Available"}
+                  {localState 
+                    ? `Focus Mode until ${backAtStr}` 
+                    : "Status changed to Available"}
                 </p>
                 <p className="text-[10px] text-[#80848e] mt-1.5">
                   Synced from Qoit • Today at {timeStr}

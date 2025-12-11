@@ -9,12 +9,13 @@ interface IntegrationNodeProps {
   data: {
     id: string;
     isQoit: boolean;
+    backAtTime: Date | null;
     index: number;
   };
 }
 
 export function IntegrationNode({ data }: IntegrationNodeProps) {
-  const { id, isQoit, index } = data;
+  const { id, isQoit, backAtTime, index } = data;
 
   // Animation delay matches the edge animation reaching this node
   const animationDelay = 0.3 * index + 0.8; // edge delay + duration
@@ -27,13 +28,13 @@ export function IntegrationNode({ data }: IntegrationNodeProps) {
         className="!w-2.5 !h-2.5 !bg-[#4a5d4a] !border-0 !left-[-5px]"
       />
       {id === "slack" && (
-        <SlackMockup isQoit={isQoit} animationDelay={animationDelay} />
+        <SlackMockup isQoit={isQoit} backAtTime={backAtTime} animationDelay={animationDelay} />
       )}
       {id === "google_calendar" && (
-        <CalendarMockup isQoit={isQoit} animationDelay={animationDelay} />
+        <CalendarMockup isQoit={isQoit} backAtTime={backAtTime} animationDelay={animationDelay} />
       )}
       {id === "discord" && (
-        <DiscordMockup isQoit={isQoit} animationDelay={animationDelay} />
+        <DiscordMockup isQoit={isQoit} backAtTime={backAtTime} animationDelay={animationDelay} />
       )}
     </div>
   );

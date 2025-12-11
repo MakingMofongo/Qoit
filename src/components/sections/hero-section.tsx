@@ -58,41 +58,43 @@ export function HeroSection() {
       <div className="max-w-3xl mx-auto relative z-10 text-center">
         <motion.div style={{ opacity: heroOpacity, y: heroY }}>
           {/* Status badge - time sensitive */}
-          {isLaunched ? (
-            <motion.a
-              href="https://www.producthunt.com/products/qoit?launch=qoit"
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="inline-flex items-center gap-2.5 bg-[#f5f4f0] border border-[#e8e6e1] rounded-full px-4 py-2 mb-12 hover:bg-[#eae9e5] transition-colors"
-            >
-              <img 
-                src="/product-hunt-logo-black-960.png" 
-                alt="Product Hunt" 
-                className="w-4 h-4 object-contain"
-              />
-              <span className="text-sm text-[#8a8780]">Live on <span className="font-medium text-[#1a1915]">Product Hunt</span></span>
-            </motion.a>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="inline-flex items-center gap-2.5 bg-[#f5f4f0] border border-[#e8e6e1] rounded-full px-4 py-2 mb-12"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-[#4a5d4a] opacity-75 animate-ping" style={{ animationDuration: "3s" }} />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4a5d4a]" />
-              </span>
-              <span className="text-sm text-[#8a8780]">Launching soon</span>
-            </motion.div>
-          )}
+          <div className="h-10 mb-12 flex items-center justify-center">
+            {isLaunched ? (
+              <motion.a
+                href="https://www.producthunt.com/products/qoit?launch=qoit"
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                className="inline-flex items-center gap-2.5 bg-[#f5f4f0] border border-[#e8e6e1] rounded-full px-4 py-2 hover:bg-[#eae9e5] transition-colors"
+              >
+                <img 
+                  src="/product-hunt-logo-black-960.png" 
+                  alt="Product Hunt" 
+                  className="w-4 h-4 object-contain"
+                />
+                <span className="text-sm text-[#8a8780]">Live on <span className="font-medium text-[#1a1915]">Product Hunt</span></span>
+              </motion.a>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                className="inline-flex items-center gap-2.5 bg-[#f5f4f0] border border-[#e8e6e1] rounded-full px-4 py-2"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-[#4a5d4a] opacity-75 animate-ping" style={{ animationDuration: "3s" }} />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4a5d4a]" />
+                </span>
+                <span className="text-sm text-[#8a8780]">Launching soon</span>
+              </motion.div>
+            )}
+          </div>
 
           {/* Main headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="text-[clamp(2.5rem,8vw,6rem)] font-display font-semibold tracking-tight mb-8 leading-[1.05]"
@@ -104,40 +106,32 @@ export function HeroSection() {
               {/* Text materializes from the convergence point */}
               <motion.span 
                 className="relative inline-block text-[#1a1915]"
-                initial={{ 
-                  scale: 0.9,
-                  opacity: 0
-                }}
-                animate={{ 
-                  scale: 1,
-                  opacity: 1
-                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ 
                   delay: 2.15,
                   duration: 0.5,
                   ease: [0.0, 0.0, 0.2, 1]
                 }}
               >
-                {/* Letters spread out from center */}
+                {/* Letters fade in with blur effect */}
                 {"quiet".split("").map((letter, i) => {
                   const centerIndex = 2; // 'i' is center
-                  const distFromCenter = i - centerIndex;
+                  const distFromCenter = Math.abs(i - centerIndex);
                   return (
                     <motion.span
                       key={i}
                       className="inline-block"
                       initial={{ 
-                        x: -distFromCenter * 15,
                         filter: "blur(4px)",
                         opacity: 0
                       }}
                       animate={{ 
-                        x: 0,
                         filter: "blur(0px)",
                         opacity: 1
                       }}
                       transition={{ 
-                        delay: 2.2 + Math.abs(distFromCenter) * 0.05,
+                        delay: 2.2 + distFromCenter * 0.05,
                         duration: 0.4,
                         ease: [0.0, 0.0, 0.2, 1]
                       }}
@@ -153,7 +147,7 @@ export function HeroSection() {
 
           {/* Subheadline */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
             className="text-lg md:text-xl text-[#8a8780] max-w-lg mx-auto mb-12"
@@ -163,7 +157,7 @@ export function HeroSection() {
 
           {/* CTA */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.6 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto mb-8"
@@ -182,17 +176,19 @@ export function HeroSection() {
             </a>
           </motion.div>
 
-          {/* Social proof - only show if there are waitlist signups */}
-          {waitlistCount !== null && waitlistCount > 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="flex items-center justify-center gap-2 text-sm text-[#8a8780] mb-6"
-            >
-              <span>Join <span className="font-medium text-[#1a1915]"><AnimatedNumber value={waitlistCount} /></span> {waitlistCount === 1 ? "other" : "others"} already using Qoit</span>
-            </motion.div>
-          )}
+          {/* Social proof - reserve space to prevent layout shift */}
+          <div className="h-6 mb-6">
+            {waitlistCount !== null && waitlistCount > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+                className="flex items-center justify-center gap-2 text-sm text-[#8a8780]"
+              >
+                <span>Join <span className="font-medium text-[#1a1915]"><AnimatedNumber value={waitlistCount} /></span> {waitlistCount === 1 ? "other" : "others"} already using Qoit</span>
+              </motion.div>
+            )}
+          </div>
 
         </motion.div>
       </div>

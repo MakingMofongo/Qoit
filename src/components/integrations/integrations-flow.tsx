@@ -24,6 +24,7 @@ const edgeTypes = {
 
 export function IntegrationsFlow() {
   const [isQoit, setIsQoit] = useState(false);
+  const [backAtTime, setBackAtTime] = useState<Date | null>(null);
   const [triggerKey, setTriggerKey] = useState(0);
   const [qoitAnimKey, setQoitAnimKey] = useState(0); // Only changes when ENTERING qoit mode
   const [qoitStartTime, setQoitStartTime] = useState(0); // Timestamp when qoit mode started
@@ -31,9 +32,12 @@ export function IntegrationsFlow() {
   const lastToggleRef = useRef<number>(0);
   const isQoitRef = useRef(false); // Track current isQoit state for comparison
 
-  const handleTimeChange = useCallback((backAtTime: Date | null) => {
+  const handleTimeChange = useCallback((newBackAtTime: Date | null) => {
     const now = Date.now();
-    const shouldBeQoit = backAtTime !== null && backAtTime.getTime() > now;
+    const shouldBeQoit = newBackAtTime !== null && newBackAtTime.getTime() > now;
+    
+    // Always update backAtTime so mockups stay reactive
+    setBackAtTime(newBackAtTime);
     
     // Only act if state is actually changing
     if (shouldBeQoit === isQoitRef.current) {
@@ -136,13 +140,13 @@ export function IntegrationsFlow() {
           x: integrationX, 
           y: integrationPositions[index].y 
         },
-        data: { ...integration, isQoit, index } as unknown as Record<
+        data: { ...integration, isQoit, backAtTime, index } as unknown as Record<
           string,
           unknown
         >,
       })),
     ];
-  }, [isQoit, handleToggle, handleTimeChange, syncState]);
+  }, [isQoit, backAtTime, handleToggle, handleTimeChange, syncState]);
 
   const edges: Edge[] = useMemo(() => {
     return INTEGRATIONS.map((integration, index) => ({

@@ -210,11 +210,26 @@ export function BackAtPicker({ value, onChange }: BackAtPickerProps) {
   const [isDragging, setIsDragging] = React.useState(false);
   const [hasMoved, setHasMoved] = React.useState(false); // Track if user has moved since drag start
   
+  // Track if component has mounted (for hydration safety)
+  const [hasMounted, setHasMounted] = React.useState(false);
+  React.useEffect(() => {
+    setHasMounted(true);
+  }, []);
+  
   // The target "back at" time - this is the source of truth
+  // Use a stable initial value for SSR, then update on client
   const [targetTime, setTargetTime] = React.useState<Date>(() => {
     if (value) return value;
-    return new Date(Date.now() + 120 * 60 * 1000); // Default 2 hours from now
+    // Use a fixed default for SSR - will be updated immediately on mount
+    return new Date(0);
   });
+  
+  // Initialize targetTime on mount to avoid hydration mismatch
+  React.useEffect(() => {
+    if (!value) {
+      setTargetTime(new Date(Date.now() + 120 * 60 * 1000));
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Calculate remaining seconds from target time
   const getRemainingSeconds = React.useCallback(() => {
@@ -224,7 +239,7 @@ export function BackAtPicker({ value, onChange }: BackAtPickerProps) {
   }, [targetTime]);
   
   // Position derived from remaining time (0-1)
-  const [position, setPosition] = React.useState(() => secondsToPosition(getRemainingSeconds()));
+  const [position, setPosition] = React.useState(0); // Start at 0 for SSR
   
   // Spring-animated position - smooth for countdown, instant when dragging
   const springPosition = useSpring(position, {
@@ -251,8 +266,18 @@ export function BackAtPicker({ value, onChange }: BackAtPickerProps) {
   // - While dragging: show preview of what you're selecting (frozen, based on slider position)
   // - While not dragging: show live countdown to target
   
-  // Countdown state
-  const [countdown, setCountdown] = React.useState(() => formatCountdown(targetTime));
+  // Countdown state - use stable initial value for SSR
+  const [countdown, setCountdown] = React.useState<ReturnType<typeof formatCountdown>>({
+    display: "--",
+    parts: [{ value: 0, unit: "h" }, { value: 0, unit: "m" }],
+    isExpired: false
+  });
+  
+  // Initialize position after mount to avoid hydration mismatch
+  React.useEffect(() => {
+    const remaining = getRemainingSeconds();
+    setPosition(secondsToPosition(remaining));
+  }, [getRemainingSeconds]);
   
   // Display time for "Back at" label
   // Only show preview time if dragging AND has moved
@@ -475,7 +500,11 @@ export function BackAtPicker({ value, onChange }: BackAtPickerProps) {
                 ))}
               </div>
               <p className="text-sm text-[#6a6965] mt-1">
-                Back at {format(displayTime, "h:mm a")} • {format(displayTime, "EEE, MMM d")}
+                {hasMounted ? (
+                  <>Back at {format(displayTime, "h:mm a")} • {format(displayTime, "EEE, MMM d")}</>
+                ) : (
+                  <>Back at --:-- -- • --</>
+                )}
               </p>
             </div>
           </div>
