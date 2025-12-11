@@ -90,16 +90,37 @@ export function IntegrationsFlow() {
 
 
   const nodes: Node[] = useMemo(() => {
+    // Node dimensions (measured from actual components)
     const qoitNodeWidth = 420;
-    const integrationNodeWidth = 280;
-    const gap = 200; // Increased gap between nodes
-    const qoitX = 0;
-    const integrationX = qoitX + qoitNodeWidth + gap;
+    const qoitNodeHeight = 500; // QoitNode is tall with timer, slider, buttons
+    const horizontalGap = 120; // Gap between qoit and integrations
     
-    // Calculate total height needed for integrations
-    const totalIntegrationHeight = INTEGRATIONS.length * 200;
-    // Center the qoit node vertically relative to integrations
-    const qoitY = (totalIntegrationHeight - 200) / 2;
+    // Integration node heights vary by type
+    const integrationHeights: Record<string, number> = {
+      slack: 175,
+      google_calendar: 195,
+      discord: 190,
+    };
+    const verticalGap = 16; // Tight gap between integration nodes
+    
+    // Calculate positions for each integration node
+    const integrationPositions: { id: string; y: number; height: number }[] = [];
+    let currentY = 0;
+    
+    for (const integration of INTEGRATIONS) {
+      const height = integrationHeights[integration.id] || 180;
+      integrationPositions.push({ id: integration.id, y: currentY, height });
+      currentY += height + verticalGap;
+    }
+    
+    // Total height of integration stack
+    const totalIntegrationsHeight = currentY - verticalGap; // Remove last gap
+    
+    // Center qoit node vertically relative to the integration stack
+    const qoitY = (totalIntegrationsHeight - qoitNodeHeight) / 2;
+    
+    const integrationX = qoitNodeWidth + horizontalGap + 40; // Fixed position for integrations
+    const qoitX = -80; // Shift qoit node left independently
     
     return [
       {
@@ -111,7 +132,10 @@ export function IntegrationsFlow() {
       ...INTEGRATIONS.map((integration, index) => ({
         id: integration.id,
         type: "integration",
-        position: { x: integrationX, y: index * 200 },
+        position: { 
+          x: integrationX, 
+          y: integrationPositions[index].y 
+        },
         data: { ...integration, isQoit, index } as unknown as Record<
           string,
           unknown
@@ -138,7 +162,7 @@ export function IntegrationsFlow() {
   }, [isQoit, triggerKey, qoitAnimKey, qoitStartTime]);
 
   return (
-    <div className="w-full h-[650px]">
+    <div className="w-full h-full">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -155,7 +179,7 @@ export function IntegrationsFlow() {
         zoomOnDoubleClick={false}
         preventScrolling={false}
         proOptions={{ hideAttribution: true }}
-        style={{ background: "transparent" }}
+        style={{ background: "transparent", width: "100%", height: "100%" }}
       />
     </div>
   );

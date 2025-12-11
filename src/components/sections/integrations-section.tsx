@@ -29,7 +29,7 @@ export function IntegrationsSection() {
           whileInView={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.8 }}
           viewport={{ once: true }}
-          className="hidden lg:block"
+          className="hidden lg:block w-full h-[700px]"
         >
           <IntegrationsFlow />
         </motion.div>

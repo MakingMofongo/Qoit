@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import type { Profile, StatusMode } from "@/types/database";
+import type { Profile, StatusMode, Database } from "@/types/database";
+
+type MessageInsert = Database["public"]["Tables"]["messages"]["Insert"];
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { StatusDot } from "@/components/ui/status-dot";
@@ -93,13 +95,14 @@ export function ProfilePage({ profile }: ProfilePageProps) {
     e.preventDefault();
     setSending(true);
 
-    const { error } = await supabase.from("messages").insert({
+    const messageData: MessageInsert = {
       profile_id: profile.id,
       sender_name: formData.name,
       sender_email: formData.email,
       content: formData.message,
       is_urgent: isUrgent,
-    });
+    };
+    const { error } = await supabase.from("messages").insert(messageData as never);
 
     setSending(false);
 

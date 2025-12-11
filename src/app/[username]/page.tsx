@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { ProfilePage } from "./profile-page";
+import type { Profile } from "@/types/database";
 
 interface PageProps {
   params: Promise<{ username: string }>;
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: PageProps) {
     .from("profiles")
     .select("*")
     .eq("username", username)
-    .single();
+    .single<Profile>();
 
   if (!profile) {
     return {
@@ -36,7 +37,7 @@ export default async function UserProfilePage({ params }: PageProps) {
     .from("profiles")
     .select("*")
     .eq("username", username)
-    .single();
+    .single<Profile>();
 
   if (!profile) {
     notFound();
