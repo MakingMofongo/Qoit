@@ -24,7 +24,7 @@
     "framer-motion": "^12.23.25",
     "html-to-image": "^1.11.13",
     "lucide-react": "^0.559.0",
-    "next": "16.0.7",
+    "next": "16.0.9",
     "react": "19.2.0",
     "react-day-picker": "^9.12.0",
     "react-dom": "19.2.0",

@@ -1,15 +1,20 @@
 "use client";
 
-import { useState, useMemo, useRef, useCallback } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
+import type React from "react";
+import { createPortal } from "react-dom";
 import {
   ReactFlow,
   type Node,
   type Edge,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { motion } from "framer-motion";
+import { ChevronLeft } from "lucide-react";
 import { QoitNode } from "./qoit-node";
 import { IntegrationNode } from "./integration-node";
 import { EnergyFlowEdge } from "./energy-flow-edge";
+import { QoitPreviewPanel } from "./qoit-preview-panel";
 import { INTEGRATIONS } from "./types";
 import type { SyncState } from "./types";
 
@@ -22,13 +27,23 @@ const edgeTypes = {
   energy: EnergyFlowEdge,
 };
 
-export function IntegrationsFlow() {
+interface IntegrationsFlowProps {
+  username?: string | null;
+  previewOpen?: boolean;
+  onPreviewOpenChange?: (isOpen: boolean) => void;
+}
+
+export function IntegrationsFlow({ username, previewOpen = false, onPreviewOpenChange }: IntegrationsFlowProps) {
   const [isQoit, setIsQoit] = useState(false);
   const [backAtTime, setBackAtTime] = useState<Date | null>(null);
   const [triggerKey, setTriggerKey] = useState(0);
   const [qoitAnimKey, setQoitAnimKey] = useState(0); // Only changes when ENTERING qoit mode
   const [qoitStartTime, setQoitStartTime] = useState(0); // Timestamp when qoit mode started
   const [syncState, setSyncState] = useState<SyncState>("idle");
+
+  const setShowPreview = useCallback((open: boolean) => {
+    onPreviewOpenChange?.(open);
+  }, [onPreviewOpenChange]);
   const lastToggleRef = useRef<number>(0);
   const isQoitRef = useRef(false); // Track current isQoit state for comparison
 
@@ -131,7 +146,7 @@ export function IntegrationsFlow() {
         id: "qoit",
         type: "qoit",
         position: { x: qoitX, y: qoitY },
-        data: { isQoit, onToggle: handleToggle, onTimeChange: handleTimeChange, syncState },
+        data: { isQoit, onToggle: handleToggle, onTimeChange: handleTimeChange, syncState, username },
       },
       ...INTEGRATIONS.map((integration, index) => ({
         id: integration.id,
@@ -140,13 +155,20 @@ export function IntegrationsFlow() {
           x: integrationX, 
           y: integrationPositions[index].y 
         },
-        data: { ...integration, isQoit, backAtTime, index } as unknown as Record<
+        data: { 
+          ...integration, 
+          isQoit, 
+          backAtTime, 
+          index, 
+          username,
+          onClick: () => setShowPreview(true)
+        } as unknown as Record<
           string,
           unknown
         >,
       })),
     ];
-  }, [isQoit, backAtTime, handleToggle, handleTimeChange, syncState]);
+  }, [isQoit, backAtTime, handleToggle, handleTimeChange, syncState, username, setShowPreview]);
 
   const edges: Edge[] = useMemo(() => {
     return INTEGRATIONS.map((integration, index) => ({
@@ -165,26 +187,93 @@ export function IntegrationsFlow() {
     }));
   }, [isQoit, triggerKey, qoitAnimKey, qoitStartTime]);
 
+  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    // Stop propagation for all node clicks to prevent closing the preview
+    event.stopPropagation();
+    
+    if (node.type === "integration") {
+      const data = node.data as { onClick?: () => void };
+      if (data.onClick) {
+        data.onClick();
+      }
+    }
+  }, []);
+
+  const [paneElement, setPaneElement] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    // Find the ReactFlow pane element
+    const findPane = () => {
+      const pane = document.querySelector('.react-flow__pane') as HTMLElement;
+      if (pane) {
+        setPaneElement(pane);
+      }
+    };
+
+    // Try immediately
+    findPane();
+
+    // Also try after a short delay in case ReactFlow hasn't rendered yet
+    const timeout = setTimeout(findPane, 100);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
-    <div className="w-full h-full">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        fitView
-        fitViewOptions={{ padding: 0.2, minZoom: 0.65, maxZoom: 1 }}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        elementsSelectable={false}
-        panOnDrag={false}
-        zoomOnScroll={false}
-        zoomOnPinch={false}
-        zoomOnDoubleClick={false}
-        preventScrolling={false}
-        proOptions={{ hideAttribution: true }}
-        style={{ background: "transparent", width: "100%", height: "100%" }}
-      />
+    <div className="w-full h-full relative">
+      <motion.div
+        animate={{
+          x: previewOpen ? -240 : 0,
+        }}
+        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+        className="w-full h-full"
+      >
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          onNodeClick={handleNodeClick}
+          onPaneClick={() => previewOpen && setShowPreview(false)}
+          fitView
+          fitViewOptions={{ padding: 0.2, minZoom: 0.65, maxZoom: 1 }}
+          nodesDraggable={false}
+          nodesConnectable={false}
+          elementsSelectable={false}
+          panOnDrag={false}
+          zoomOnScroll={false}
+          zoomOnPinch={false}
+          zoomOnDoubleClick={false}
+          preventScrolling={false}
+          proOptions={{ hideAttribution: true }}
+          style={{ background: "transparent", width: "100%", height: "100%" }}
+        />
+      </motion.div>
+      
+      {/* Chevron button to open preview */}
+      {paneElement && createPortal(
+        <motion.button
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          whileHover={{ x: -4 }}
+          onClick={() => setShowPreview(true)}
+          className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#1a1a18] border border-[#2a2a28] flex items-center justify-center hover:bg-[#2a2a28] hover:border-[#4a5d4a] transition-colors z-30 shadow-lg"
+          style={{ pointerEvents: "all" }}
+        >
+          <ChevronLeft className="w-5 h-5 text-[#faf9f7]" />
+        </motion.button>,
+        paneElement
+      )}
+      
+      {paneElement && createPortal(
+        <QoitPreviewPanel
+          isOpen={previewOpen}
+          onClose={() => setShowPreview(false)}
+          isQoit={isQoit}
+          backAtTime={backAtTime}
+        />,
+        paneElement
+      )}
     </div>
   );
 }

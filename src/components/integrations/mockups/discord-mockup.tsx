@@ -8,9 +8,10 @@ interface DiscordMockupProps {
   isQoit: boolean;
   backAtTime: Date | null;
   animationDelay: number;
+  username?: string | null;
 }
 
-export function DiscordMockup({ isQoit, backAtTime, animationDelay }: DiscordMockupProps) {
+export function DiscordMockup({ isQoit, backAtTime, animationDelay, username }: DiscordMockupProps) {
   const [localState, setLocalState] = useState(isQoit);
   const [localBackAtTime, setLocalBackAtTime] = useState<Date | null>(backAtTime);
 
@@ -107,6 +108,9 @@ export function DiscordMockup({ isQoit, backAtTime, animationDelay }: DiscordMoc
                 </p>
                 <p className="text-[10px] text-[#80848e] mt-1.5">
                   Synced from Qoit • Today at {timeStr}
+                </p>
+                <p className="text-[10px] text-[#8ab4f8] mt-1 font-mono font-medium">
+                  qoit.page/{username || "maya"}
                 </p>
               </div>
             </div>

@@ -8,9 +8,10 @@ interface SlackMockupProps {
   isQoit: boolean;
   backAtTime: Date | null;
   animationDelay: number;
+  username?: string | null;
 }
 
-export function SlackMockup({ isQoit, backAtTime, animationDelay }: SlackMockupProps) {
+export function SlackMockup({ isQoit, backAtTime, animationDelay, username }: SlackMockupProps) {
   const [localState, setLocalState] = useState(isQoit);
   const [localBackAtTime, setLocalBackAtTime] = useState<Date | null>(backAtTime);
 
@@ -101,11 +102,14 @@ export function SlackMockup({ isQoit, backAtTime, animationDelay }: SlackMockupP
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="mt-3 pt-3 border-t border-[#2a2a28]"
+              className="mt-3 pt-3 border-t border-[#2a2a28] space-y-2"
             >
               <div className="text-[10px] text-[#6a6a65] flex items-center gap-1">
                 <span>Notifications paused</span>
                 <span className="text-[#4a5d4a]">• Until {formatBackAtTime(localBackAtTime)}</span>
+              </div>
+              <div className="text-[10px] text-[#8ab4f8] font-mono">
+                qoit.page/{username || "maya"}
               </div>
             </motion.div>
           )}

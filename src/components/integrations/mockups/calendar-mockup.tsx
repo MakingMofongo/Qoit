@@ -8,11 +8,12 @@ interface CalendarMockupProps {
   isQoit: boolean;
   backAtTime: Date | null;
   animationDelay: number;
+  username?: string | null;
 }
 
 type ViewMode = "hours" | "days" | "week";
 
-export function CalendarMockup({ isQoit, backAtTime, animationDelay }: CalendarMockupProps) {
+export function CalendarMockup({ isQoit, backAtTime, animationDelay, username }: CalendarMockupProps) {
   const [localState, setLocalState] = useState(isQoit);
   const [localBackAtTime, setLocalBackAtTime] = useState<Date | null>(backAtTime);
   const [now, setNow] = useState(() => new Date());
@@ -259,6 +260,14 @@ export function CalendarMockup({ isQoit, backAtTime, animationDelay }: CalendarM
                     >
                       {hoursViewData.timeRangeLabel}
                     </motion.div>
+                    <motion.div 
+                      className="text-[9px] text-[#faf9f7] mt-1 font-mono truncate opacity-90"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.9 }}
+                      transition={{ delay: 0.15 }}
+                    >
+                      qoit.page/{username || "maya"}
+                    </motion.div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -317,6 +326,14 @@ export function CalendarMockup({ isQoit, backAtTime, animationDelay }: CalendarM
                       transition={{ delay: 0.15 }}
                     >
                       Until {format(localBackAtTime, "EEE h:mm a")}
+                    </motion.div>
+                    <motion.div 
+                      className="text-[9px] text-[#faf9f7] mt-1 font-mono opacity-90"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.9 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      qoit.page/{username || "maya"}
                     </motion.div>
                   </motion.div>
                 )}
@@ -380,6 +397,14 @@ export function CalendarMockup({ isQoit, backAtTime, animationDelay }: CalendarM
                         transition={{ delay: 0.2 }}
                       >
                         Qoit Mode
+                      </motion.span>
+                      <motion.span 
+                        className="text-[9px] text-[#faf9f7] font-mono ml-1.5 opacity-90"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 0.9 }}
+                        transition={{ delay: 0.25 }}
+                      >
+                        qoit.page/{username || "maya"}
                       </motion.span>
                     </motion.div>
                   </motion.div>

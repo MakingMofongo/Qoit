@@ -275,9 +275,10 @@ export function BackAtPicker({ value, onChange }: BackAtPickerProps) {
   
   // Initialize position after mount to avoid hydration mismatch
   React.useEffect(() => {
+    if (isDragging) return; // Don't override position while dragging
     const remaining = getRemainingSeconds();
     setPosition(secondsToPosition(remaining));
-  }, [getRemainingSeconds]);
+  }, [getRemainingSeconds, isDragging]);
   
   // Display time for "Back at" label
   // Only show preview time if dragging AND has moved

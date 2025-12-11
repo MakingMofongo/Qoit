@@ -1,11 +1,45 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { IntegrationsFlow } from "../integrations/integrations-flow";
 
 export function IntegrationsSection() {
+  const [username, setUsername] = useState<string | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const getUserProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("username")
+          .eq("id", user.id)
+          .single<{ username: string | null }>();
+        if (profile?.username) {
+          setUsername(profile.username);
+        }
+      }
+    };
+    
+    getUserProfile();
+  }, [supabase]);
+
+  const handleSectionClick = () => {
+    if (isPreviewOpen) {
+      setIsPreviewOpen(false);
+    }
+  };
+
   return (
-    <section className="py-32 px-6 bg-[#0d0d0b] text-[#faf9f7] overflow-hidden">
+    <section 
+      className="py-32 px-6 text-[#faf9f7] overflow-hidden transition-colors duration-300"
+      style={{ backgroundColor: isPreviewOpen ? "#010101" : "#0d0d0b" }}
+      onClick={handleSectionClick}
+    >
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -31,7 +65,11 @@ export function IntegrationsSection() {
           viewport={{ once: true }}
           className="hidden lg:block w-full h-[700px]"
         >
-          <IntegrationsFlow />
+          <IntegrationsFlow 
+            username={username} 
+            previewOpen={isPreviewOpen}
+            onPreviewOpenChange={setIsPreviewOpen} 
+          />
         </motion.div>
 
         {/* Mobile fallback */}

@@ -12,11 +12,12 @@ interface QoitNodeProps {
     onToggle: () => void;
     onTimeChange?: (date: Date | null) => void;
     syncState: SyncState;
+    username?: string | null;
   };
 }
 
 export function QoitNode({ data }: QoitNodeProps) {
-  const { isQoit, onToggle, onTimeChange, syncState } = data;
+  const { isQoit, onToggle, onTimeChange, syncState, username } = data;
 
   // Calculate "back at" time (current time + 1 hour for demo)
   const defaultBackAtTime = useMemo(() => {
@@ -136,7 +137,12 @@ export function QoitNode({ data }: QoitNodeProps) {
                   animate={{ backgroundColor: isQoit ? "#faf9f7" : "#1a1915" }}
                 />
               </motion.div>
-              <span className="text-sm font-semibold text-[#faf9f7]">qoit</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold text-[#faf9f7]">qoit</span>
+                <span className="text-[10px] text-[#6a6a65] font-mono">
+                  qoit.page/{username || "maya"}
+                </span>
+              </div>
             </div>
             <div className="flex items-center gap-1.5">
               <motion.div
