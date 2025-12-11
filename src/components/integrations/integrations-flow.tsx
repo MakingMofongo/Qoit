@@ -112,34 +112,105 @@ export function IntegrationsFlow({ username, previewOpen = false, onPreviewOpenC
     // Node dimensions (measured from actual components)
     const qoitNodeWidth = 420;
     const qoitNodeHeight = 500; // QoitNode is tall with timer, slider, buttons
-    const horizontalGap = 120; // Gap between qoit and integrations
+    const horizontalGap = 60; // Gap between columns
+    const columnWidth = 280; // Width of integration nodes
     
     // Integration node heights vary by type
     const integrationHeights: Record<string, number> = {
       slack: 175,
       google_calendar: 195,
       discord: 190,
+      freelance_bio: 285,
+      qoit_page: 220,
     };
     const verticalGap = 16; // Tight gap between integration nodes
+    const publicColumnGap = 64; // Slightly larger gap for public-facing column
     
-    // Calculate positions for each integration node
-    const integrationPositions: { id: string; y: number; height: number }[] = [];
-    let currentY = 0;
+    // Split integrations into two columns:
+    // Column 1: Internal tools (Slack, Calendar, Discord)
+    // Column 2: Public-facing (Freelance Bio, Qoit Page)
+    const internalIntegrations = INTEGRATIONS.filter(i => 
+      ["slack", "google_calendar", "discord"].includes(i.id)
+    );
+    const publicIntegrations = INTEGRATIONS.filter(i => 
+      ["freelance_bio", "qoit_page"].includes(i.id)
+    );
     
-    for (const integration of INTEGRATIONS) {
+    // Calculate positions for column 1 (internal)
+    const col1Positions: { id: string; y: number; height: number }[] = [];
+    let col1Y = 0;
+    for (const integration of internalIntegrations) {
       const height = integrationHeights[integration.id] || 180;
-      integrationPositions.push({ id: integration.id, y: currentY, height });
-      currentY += height + verticalGap;
+      col1Positions.push({ id: integration.id, y: col1Y, height });
+      col1Y += height + verticalGap;
+    }
+    const col1Height = col1Y - verticalGap;
+    
+    // Calculate positions for column 2 (public)
+    const col2Positions: { id: string; y: number; height: number }[] = [];
+    let col2Y = 0;
+    for (const integration of publicIntegrations) {
+      const height = integrationHeights[integration.id] || 180;
+      col2Positions.push({ id: integration.id, y: col2Y, height });
+      col2Y += height + publicColumnGap;
+    }
+    const col2Height = col2Y - publicColumnGap;
+    
+    // Use the taller column to center everything
+    const maxColumnHeight = Math.max(col1Height, col2Height);
+    const col1OffsetY = (maxColumnHeight - col1Height) / 2;
+    const col2OffsetY = (maxColumnHeight - col2Height) / 2;
+    
+    // Center qoit node vertically relative to the tallest column
+    const qoitY = (maxColumnHeight - qoitNodeHeight) / 2;
+    
+    const qoitX = -240;
+    const col1X = qoitNodeWidth + horizontalGap - 80;
+    const col2X = col1X + columnWidth + horizontalGap;
+    
+    // Build node list with proper indices for animation delays
+    const integrationNodes: Node[] = [];
+    let globalIndex = 0;
+    
+    for (let i = 0; i < internalIntegrations.length; i++) {
+      const integration = internalIntegrations[i];
+      integrationNodes.push({
+        id: integration.id,
+        type: "integration",
+        position: { 
+          x: col1X, 
+          y: col1Positions[i].y + col1OffsetY 
+        },
+        data: { 
+          ...integration, 
+          isQoit, 
+          backAtTime, 
+          index: globalIndex++, 
+          username,
+          onClick: () => setShowPreview(true)
+        } as unknown as Record<string, unknown>,
+      });
     }
     
-    // Total height of integration stack
-    const totalIntegrationsHeight = currentY - verticalGap; // Remove last gap
-    
-    // Center qoit node vertically relative to the integration stack
-    const qoitY = (totalIntegrationsHeight - qoitNodeHeight) / 2;
-    
-    const integrationX = qoitNodeWidth + horizontalGap + 40; // Fixed position for integrations
-    const qoitX = -80; // Shift qoit node left independently
+    for (let i = 0; i < publicIntegrations.length; i++) {
+      const integration = publicIntegrations[i];
+      integrationNodes.push({
+        id: integration.id,
+        type: "integration",
+        position: { 
+          x: col2X, 
+          y: col2Positions[i].y + col2OffsetY 
+        },
+        data: { 
+          ...integration, 
+          isQoit, 
+          backAtTime, 
+          index: globalIndex++, 
+          username,
+          onClick: () => setShowPreview(true)
+        } as unknown as Record<string, unknown>,
+      });
+    }
     
     return [
       {
@@ -148,25 +219,7 @@ export function IntegrationsFlow({ username, previewOpen = false, onPreviewOpenC
         position: { x: qoitX, y: qoitY },
         data: { isQoit, onToggle: handleToggle, onTimeChange: handleTimeChange, syncState, username },
       },
-      ...INTEGRATIONS.map((integration, index) => ({
-        id: integration.id,
-        type: "integration",
-        position: { 
-          x: integrationX, 
-          y: integrationPositions[index].y 
-        },
-        data: { 
-          ...integration, 
-          isQoit, 
-          backAtTime, 
-          index, 
-          username,
-          onClick: () => setShowPreview(true)
-        } as unknown as Record<
-          string,
-          unknown
-        >,
-      })),
+      ...integrationNodes,
     ];
   }, [isQoit, backAtTime, handleToggle, handleTimeChange, syncState, username, setShowPreview]);
 

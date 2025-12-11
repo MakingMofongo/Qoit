@@ -18,6 +18,14 @@ export const INTEGRATIONS: Integration[] = [
     id: "discord",
     available: true,
   },
+  {
+    id: "freelance_bio",
+    available: true,
+  },
+  {
+    id: "qoit_page",
+    available: true,
+  },
 ];
 
 

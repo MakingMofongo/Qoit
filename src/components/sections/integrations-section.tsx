@@ -51,10 +51,10 @@ export function IntegrationsSection() {
             Integrations
           </p>
           <h2 className="text-4xl md:text-5xl font-display font-semibold tracking-tight mb-4">
-            Watch it sync in real-time
+            One link. Everywhere you work.
           </h2>
           <p className="text-lg text-[#6a6a65] max-w-lg mx-auto">
-            One toggle. Every platform updates instantly.
+            Share your Qoit page. Clients see when you&apos;re reachable — no guesswork.
           </p>
         </motion.div>
 
@@ -85,10 +85,10 @@ export function IntegrationsSection() {
           className="mt-8 text-center"
         >
           <div className="inline-flex items-center gap-4 px-6 py-3 rounded-full bg-[#1a1a18] border border-[#2a2a28]">
-            <span className="text-xl font-display font-bold text-[#4a5d4a]">3</span>
+            <span className="text-xl font-display font-bold text-[#4a5d4a]">5</span>
             <span className="text-[#5a5a55] text-sm">platforms live</span>
             <div className="w-px h-4 bg-[#2a2a28]" />
-            <span className="text-[#5a5a55] text-sm">6+ coming soon</span>
+            <span className="text-[#5a5a55] text-sm">more coming soon</span>
           </div>
         </motion.div>
       </div>

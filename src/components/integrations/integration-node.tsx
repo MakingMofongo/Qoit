@@ -4,6 +4,8 @@ import { Handle, Position } from "@xyflow/react";
 import { SlackMockup } from "./mockups/slack-mockup";
 import { CalendarMockup } from "./mockups/calendar-mockup";
 import { DiscordMockup } from "./mockups/discord-mockup";
+import { FreelanceBioMockup } from "./mockups/freelance-bio-mockup";
+import { QoitPageMockup } from "./mockups/qoit-page-mockup";
 
 interface IntegrationNodeProps {
   data: {
@@ -44,6 +46,12 @@ export function IntegrationNode({ data }: IntegrationNodeProps) {
         )}
         {id === "discord" && (
           <DiscordMockup isQoit={isQoit} backAtTime={backAtTime} animationDelay={animationDelay} username={username} />
+        )}
+        {id === "freelance_bio" && (
+          <FreelanceBioMockup isQoit={isQoit} backAtTime={backAtTime} animationDelay={animationDelay} username={username} />
+        )}
+        {id === "qoit_page" && (
+          <QoitPageMockup isQoit={isQoit} backAtTime={backAtTime} animationDelay={animationDelay} username={username} />
         )}
       </div>
     </div>
