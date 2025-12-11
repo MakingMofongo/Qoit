@@ -75,18 +75,22 @@ interface BackAtPickerProps {
   onChange: (date: Date | null) => void;
 }
 
-// Slider config - logarithmic scale from 1 min to 7 days (in seconds internally)
-const MIN_SECONDS = 60; // 1 minute
+// Slider config - logarithmic scale from 0 to 7 days (in seconds internally)
+const MIN_SECONDS = 0; // 0 seconds = you're back
 const MAX_SECONDS = 60 * 60 * 24 * 7; // 7 days in seconds
 const SECONDS_THRESHOLD = 60 * 2; // Below 2 min, allow second-level precision
+const MIN_LOG_SECONDS = 1; // Use 1 second for log calculations (log(0) is undefined)
 
 // Convert slider position (0-1) to seconds using logarithmic scale
 const positionToSeconds = (position: number): number => {
-  const minLog = Math.log(MIN_SECONDS);
+  // Handle position 0 (leftmost) as 0 seconds
+  if (position === 0) return 0;
+  
+  const minLog = Math.log(MIN_LOG_SECONDS);
   const maxLog = Math.log(MAX_SECONDS);
   const seconds = Math.exp(minLog + position * (maxLog - minLog));
   
-  // Below 15 min threshold: allow second precision
+  // Below threshold: allow second precision
   // Above: round to nearest minute
   if (seconds < SECONDS_THRESHOLD) {
     return Math.round(seconds);
@@ -96,7 +100,10 @@ const positionToSeconds = (position: number): number => {
 
 // Convert seconds to slider position (0-1)
 const secondsToPosition = (seconds: number): number => {
-  const minLog = Math.log(MIN_SECONDS);
+  // Handle 0 seconds as position 0
+  if (seconds === 0) return 0;
+  
+  const minLog = Math.log(MIN_LOG_SECONDS);
   const maxLog = Math.log(MAX_SECONDS);
   return (Math.log(seconds) - minLog) / (maxLog - minLog);
 };
@@ -112,8 +119,11 @@ const minutesToPosition = (minutes: number): number => {
 
 // Format minutes into readable string (for slider display)
 const formatDuration = (minutes: number): { value: string; unit: string } => {
+  if (minutes === 0) {
+    return { value: "0", unit: "now" };
+  }
   if (minutes < 60) {
-    return { value: String(minutes), unit: "min" };
+    return { value: String(Math.round(minutes)), unit: "min" };
   } else if (minutes < 60 * 24) {
     const hours = Math.round(minutes / 60 * 10) / 10;
     return { 
@@ -185,6 +195,7 @@ const getDurationStyle = (minutes: number): { icon: React.ReactNode; color: stri
 
 // Markers for the timeline
 const MARKERS = [
+  { minutes: 0, label: "Now" },
   { minutes: 1, label: "1m" },
   { minutes: 5, label: "5m" },
   { minutes: 15, label: "15m" },
@@ -208,7 +219,8 @@ export function BackAtPicker({ value, onChange }: BackAtPickerProps) {
   // Calculate remaining seconds from target time
   const getRemainingSeconds = React.useCallback(() => {
     const remaining = Math.max(0, (targetTime.getTime() - Date.now()) / 1000);
-    return Math.max(MIN_SECONDS, Math.min(MAX_SECONDS, remaining));
+    // Allow 0, clamp to max
+    return Math.min(MAX_SECONDS, remaining);
   }, [targetTime]);
   
   // Position derived from remaining time (0-1)

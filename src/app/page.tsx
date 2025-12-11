@@ -5,6 +5,7 @@ import { Navigation } from "@/components/sections/navigation";
 import { HeroSection } from "@/components/sections/hero-section";
 import { PreviewSection } from "@/components/sections/preview-section";
 import { ModesSection } from "@/components/sections/modes-section";
+import { IntegrationsSection } from "@/components/sections/integrations-section";
 import { FeaturesSection } from "@/components/sections/features-section";
 import { TestimonialsSection } from "@/components/sections/testimonials-section";
 import { HowItWorksSection } from "@/components/sections/how-it-works-section";
@@ -26,6 +27,7 @@ export default function Home(_props: PageProps) {
       <HeroSection />
       <PreviewSection />
       <ModesSection />
+      <IntegrationsSection />
       <FeaturesSection />
       <TestimonialsSection />
       <HowItWorksSection />
